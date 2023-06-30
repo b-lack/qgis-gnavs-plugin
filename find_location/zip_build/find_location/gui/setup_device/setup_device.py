@@ -44,6 +44,14 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
         else:
             self.geSetupLabel.setText("Plugin NOT FOUND")
     
+    def status_changed(self, gpsInfo):
+        try:
+            if self.gpsCon.status() == 3: #data received
+                self.gpsInfo = self.gpsCon.currentGPSInformation()
+                QgsMessageLog.logMessage(gpsInfo.longitude, "FindLocation")
+        except:
+            QgsMessageLog.logMessage("error", "FindLocation")
+
     def test(self):
         # https://qgis.org/pyqgis/3.2/core/Gps/QgsGpsInformation.html
 
@@ -51,8 +59,9 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
         connectionList = connectionRegistry.connectionList()
         if len(connectionList) > 0:
             # QgsGpsConnection
-            connection = connectionList[0]
-            information = connection.currentGPSInformation()
-            QgsMessageLog.logMessage(str(information.latitude), "FindLocation")
+            self.gpsCon = connectionList[0]
+            self.gpsCon.stateChanged.connect(self.status_changed)
+            
+            QgsMessageLog.logMessage(str('state.change'), "FindLocation")
 
     
