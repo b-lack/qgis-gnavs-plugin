@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/gerrit/Sites/lfb/search-find-qgis-plugin/find_location/zip_build/find_location/gui/setup_device/setup_device.ui'
+# Form implementation generated from reading ui file '/home/gerrit/Sites/lfb/search-find-qgis-plugin/find_location/gui/setup_device/setup_device.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -20,6 +20,9 @@ class Ui_Form(object):
         self.geSetupLabel = QtWidgets.QLabel(Form)
         self.geSetupLabel.setObjectName("geSetupLabel")
         self.verticalLayout.addWidget(self.geSetupLabel)
+        self.pushButton = QtWidgets.QPushButton(Form)
+        self.pushButton.setObjectName("pushButton")
+        self.verticalLayout.addWidget(self.pushButton)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
 
@@ -30,3 +33,4 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.geSetupLabel.setText(_translate("Form", "Setup"))
+        self.pushButton.setText(_translate("Form", "Check"))

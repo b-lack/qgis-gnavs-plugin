@@ -20,13 +20,13 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
         QDialog.__init__(self, interface.mainWindow())
         self.setupUi(self)
 
+        self.pushButton.clicked.connect(self.test)
+
         s=QgsSettings()
         val=s.value(PLUGIN_NAME+"/layername_fieldname_a")
         QgsMessageLog.logMessage(str(val), "FindLocation")
 
-        connectionRegistry = QgsApplication.gpsConnectionRegistry()
-        connectionList = connectionRegistry.connectionList()
-        QgsMessageLog.logMessage(str(connectionList), "FindLocation")
+        
         #GPSInfo = connectionList[0].currentGPSInformation()
 
         #s.setValue(PLUGIN_NAME+"/layername_fieldname_a", 66)
@@ -43,6 +43,10 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
             QgsMessageLog.logMessage(str(results), "FindLocation")
         else:
             self.geSetupLabel.setText("Plugin NOT FOUND")
-        
+    
+    def test(self):
+        connectionRegistry = QgsApplication.gpsConnectionRegistry()
+        connectionList = connectionRegistry.connectionList()
+        QgsMessageLog.logMessage(str(connectionList), "FindLocation")
 
     
