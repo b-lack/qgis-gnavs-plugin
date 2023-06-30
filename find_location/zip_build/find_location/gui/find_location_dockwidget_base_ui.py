@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/gerrit/Sites/lfb/search-find-qgis-plugin/find_location/gui/find_location_dockwidget_base.ui'
+# Form implementation generated from reading ui file '/home/gerrit/Sites/lfb/search-find-qgis-plugin/find_location/zip_build/find_location/gui/find_location_dockwidget_base.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #

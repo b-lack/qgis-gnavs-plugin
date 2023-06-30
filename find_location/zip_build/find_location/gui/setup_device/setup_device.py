@@ -45,11 +45,14 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
             self.geSetupLabel.setText("Plugin NOT FOUND")
     
     def test(self):
+        # https://qgis.org/pyqgis/3.2/core/Gps/QgsGpsInformation.html
+
         connectionRegistry = QgsApplication.gpsConnectionRegistry()
         connectionList = connectionRegistry.connectionList()
         if len(connectionList) > 0:
             # QgsGpsConnection
             connection = connectionList[0]
-            QgsMessageLog.logMessage(str(connection.currentGPSInformation()), "FindLocation")
+            information = connection.currentGPSInformation()
+            QgsMessageLog.logMessage(str(information.latitude), "FindLocation")
 
     
