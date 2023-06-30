@@ -47,6 +47,9 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
     def test(self):
         connectionRegistry = QgsApplication.gpsConnectionRegistry()
         connectionList = connectionRegistry.connectionList()
-        QgsMessageLog.logMessage(str(len(connectionList)), "FindLocation")
+        if len(connectionList) > 0:
+            # QgsGpsConnection
+            connection = connectionList[0]
+            QgsMessageLog.logMessage(str(connection.currentGPSInformation()), "FindLocation")
 
     
