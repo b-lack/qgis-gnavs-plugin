@@ -50,7 +50,7 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
                 self.gpsInfo = self.gpsCon.currentGPSInformation()
                 QgsMessageLog.logMessage(gpsInfo.longitude, "FindLocation")
         except:
-            QgsMessageLog.logMessage("error", "FindLocation")
+            QgsMessageLog.logMessage(str(self.gpsCon.status()), "FindLocation")
 
     def test(self):
         # https://qgis.org/pyqgis/3.2/core/Gps/QgsGpsInformation.html
