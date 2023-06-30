@@ -63,5 +63,8 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
             self.gpsCon.stateChanged.connect(self.status_changed)
             
             QgsMessageLog.logMessage(str('state.change'), "FindLocation")
+            
+        else:
+            QgsMessageLog.logMessage(str('no.gps'), "FindLocation")
 
     
