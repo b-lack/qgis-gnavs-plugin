@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/plugins/find_location" >
+        <file>icon.png</file>
+    </qresource>
+</RCC>
