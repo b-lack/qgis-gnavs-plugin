@@ -49,8 +49,8 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
         QgsMessageLog.logMessage('Status:' + str(self.gpsCon.status()), "FindLocation")
 
         if self.gpsCon.status() == 3: #data received
-            QgsMessageLog.logMessage(gpsInfo.longitude, "FindLocation")
-            QgsMessageLog.logMessage(gpsInfo.status, "FindLocation")
+            QgsMessageLog.logMessage(str(gpsInfo.longitude), "FindLocation")
+            QgsMessageLog.logMessage(str(gpsInfo.status), "FindLocation")
            
 
     def test(self):
