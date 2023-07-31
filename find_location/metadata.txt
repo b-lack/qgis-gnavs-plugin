@@ -27,7 +27,7 @@ tags=python, location, navigation
 
 homepage=https://github.com/b-lack/search-find-qgis-plugin
 category=Plugins
-icon=icon.png
+icon=assets/icon.png
 # experimental flag
 experimental=True
 

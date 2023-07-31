@@ -1,33 +1,34 @@
-import math
-import os
 
-import pandas as pd
+import os
 
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QDialog
 from PyQt5 import QtCore
 from qgis.PyQt.QtCore import QSettings
 
+from qgis.core import QgsSettings, QgsWkbTypes, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection
 
-from ....utils.helper import Utils
+import pandas as pd
 
-from qgis.core import QgsSettings, QgsApplication, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection
+from ...utils.utils import Utils
 
-UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'setup_device.ui'))
 
-PLUGIN_NAME = "lfb_regeneration_wildlife_impact" #lfb_regeneration_wildlife_impact/pb_tool.cfg
+UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'recording.ui'))
 
-class SetupDevice(QtWidgets.QWidget, UI_CLASS):
-    inputChanged = QtCore.pyqtSignal(object, str, bool)
+PLUGIN_NAME = "find_location"
 
-    def __init__(self, interface, json, value, attr, inheritedErrors):
+class Recording(QtWidgets.QWidget, UI_CLASS):
+
+    inputChanged = QtCore.pyqtSignal(object)
+    currentPositionChanged = QtCore.pyqtSignal(object)
+
+    def __init__(self, interface, bestCount=5):
         """Constructor."""
 
         QDialog.__init__(self, interface.mainWindow())
         self.setupUi(self)
-
-        self.json = json
-        self.attr = attr
+    
+        self.bestCount = bestCount
         self.measures = []
 
         self.gpsCon = None
@@ -47,16 +48,10 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
         self.lfbCancelCoordinatesBtn.clicked.connect(self.cancelConnection)
         self.lfbCancelCoordinatesBtn.setEnabled(False)
 
+
+        self.updateSerialPortSelection()
         self.lfbSerialPortList.currentIndexChanged.connect(self.onSerialPortChanged)
-
-        #s=QgsSettings()
-        #val=s.value(PLUGIN_NAME+"/layername_fieldname_a")
-        # https://gis.stackexchange.com/questions/307209/accessing-gps-via-pyqgis
-        #GPSInfo = connectionList[0].currentGPSInformation()
-        #s.setValue(PLUGIN_NAME+"/layername_fieldname_a", 66)
-
-        self.ports = self.getSerialPorts()
-        self.updateSerialPortSelection(self.ports)
+        self.geRefreshSerialListBtn.clicked.connect(self.updateSerialPortSelection)
 
         serialSetting = self.getGPSSettings()
         
@@ -70,12 +65,16 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
         #self.availablePorts = self.autoSelectPort()
         #self.tryNextPort()
 
+
     def getSerialPorts(self):
         return QgsGpsDetector.availablePorts()
     
-    def updateSerialPortSelection(self, ports):
+    def updateSerialPortSelection(self):
+
+        self.ports = self.getSerialPorts()
+
         self.lfbSerialPortList.clear()
-        for port in ports:
+        for port in self.ports:
             self.lfbSerialPortList.addItem(port[0], port[0])
 
     def selectPort(self, port):
@@ -87,14 +86,63 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
         return QgsSettings().value('gps/gpsd-serial-device')
     
     def onSerialPortChanged(self, index):
+        newPort = self.lfbSerialPortList.itemData(index)
+        if newPort is None or newPort == 'None':
+            return
+        
+        #port  = self.lfbSerialPortList.itemData(index)
+        #self.connectionTest(port)
+    
         self.port = self.lfbSerialPortList.itemData(index)
         QgsSettings().setValue('gps/gpsd-serial-device', self.port)
+        
+
+    def connectionTest(self, port):
+        if port is None:
+            self.geConnectionInfoLabel.setText('Wähle ein "Serielles Gerät" aus.')
+            return
+        
+        self.geConnectionInfoLabel.setText("Teste Verbindung...")
+        QgsMessageLog.logMessage("Teste Verbindung..." + str(port), 'LFB')
+
+        try:
+            self.gpsDetectorTest.detected.disconnect(self.connectionTestSucceed)
+            self.gpsDetectorTest.detectionFailed.disconnect(self.connectionTestFailed)
+        except:
+            pass
+
+        self.gpsDetectorTest = QgsGpsDetector(port)
+        self.gpsDetectorTest.detected[QgsGpsConnection].connect(self.connectionTestSucceed)
+        self.gpsDetectorTest.detectionFailed.connect(self.connectionTestFailed)
+       
+        self.gpsDetectorTest.advance()
+
+
+    def connectionTestFailed(self):
+        
+        self.geConnectionInfoLabel.setText("Verbindung fehlgeschlagen.")
+        try:
+            self.gpsDetectorTest.detected.disconnect(self.connectionTestSucceed)
+            self.gpsDetectorTest.detectionFailed.disconnect(self.connectionTestFailed)
+        except:
+            pass
+
+    def connectionTestSucceed(self, connection):
+        self.geConnectionInfoLabel.setText("Verbindung erfolgreich.")
+
+        try:
+            self.gpsDetectorTest.detected.disconnect(self.connectionTestSucceed)
+            self.gpsDetectorTest.detectionFailed.disconnect(self.connectionTestFailed)
+        except:
+            pass
+
+        self.connection_succeed(connection)
+
     
     def connect(self, port):
         if self.port is None:
             self.lfbGPSError.setText('Wähle ein "Serielles Gerät" aus.')
             return
-        
         try:
             self.gpsDetector.detected[QgsGpsConnection].disconnect(self.connection_succeed)
             self.gpsDetector.detectionFailed.disconnect(self.connection_failed)
@@ -143,8 +191,8 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
         if not isinstance(connection, QgsNmeaConnection):
             QgsMessageLog.logMessage('is not QgsNmeaConnection', 'LFB')
             import sip
-            gpsConnection = sip.cast(connection, QgsGpsConnection)
-            self.gpsCon = gpsConnection
+            self.gpsCon =  sip.cast(connection, QgsGpsConnection)
+            #self.gpsCon = gpsConnection
 
         elif isinstance(connection, QgsGpsConnection):
             self.gpsCon = gpsConnection
@@ -175,8 +223,6 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
 
     def status_changed(self, gpsInfo):
         
-        QgsMessageLog.logMessage(str('fff'), 'LFB')
-        
 
         try:
             self.lfbGPSState.setText('Daten wurden erfolgreich ermittelt.')
@@ -190,37 +236,30 @@ class SetupDevice(QtWidgets.QWidget, UI_CLASS):
         self.lfbGPSCount.setText(str(len(self.measures)))
 
     def emitAggregatedValues(self, GPSInfo):
+
+        if not GPSInfo.isValid():
+            QgsMessageLog.logMessage('GPSInfo is not valid', 'LFB')
+            return
         
+        self.measures.insert(0, GPSInfo)
 
-        lat = GPSInfo.latitude
-        long = GPSInfo.longitude
-        hdop = GPSInfo.hdop
-        vdop = GPSInfo.vdop
-        elevation = GPSInfo.elevation
-        satellitesUsed = GPSInfo.satellitesUsed
+        self.measures.sort(key=lambda x: x.satellitesUsed, reverse=False)
+        self.measures.sort(key=lambda x: x.pdop, reverse=True)
+        self.measures.sort(key=lambda x: x.hdop, reverse=True)
 
-        measure = [lat,long,elevation, hdop,vdop, satellitesUsed]
-        self.measures.append(measure)
+
+        # Strip the list to 5 elements
+        self.measures = self.measures[:5]
+
         self.setMeasurementsCount()
 
-        df = pd.DataFrame(self.measures)
-        #result = [str(df[0].mean()), str(df[1].mean()), str(df[2].mean()), str(df[3].mean()), str(df[4].mean()), str(df[5].mean())]
 
         
-
-        self.json['istgeom_y'] = df[0].mean()
-        self.json['istgeom_x'] = df[1].mean()
-        
-        self.json['istgeom_elev'] = df[2].mean()
-
-        self.json['istgeom_hdop'] = df[3].mean()
-        self.json['istgeom_vdop'] = df[4].mean()     
-
-        self.json['istgeom_sat'] = df[5].mean()
-
-        if len(self.measures) >= 5:
-            self.inputChanged.emit(self.json, self.attr, True)
+        if len(self.measures) >= self.bestCount:
+            self.inputChanged.emit(self.measures)
             self.cancelConnection()
+        else:
+            self.currentPositionChanged.emit(GPSInfo)
 
-    def setJson(self, newJson, setFields = True):
-        self.json = newJson
+
+    

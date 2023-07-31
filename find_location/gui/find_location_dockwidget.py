@@ -27,10 +27,14 @@ import os
 from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal
 
-from .setup_device.setup_device import SetupDevice
+from qgis.core import QgsMessageLog
 
-FORM_CLASS, _ = uic.loadUiType(os.path.join(
-    os.path.dirname(__file__), 'find_location_dockwidget_base.ui'))
+from qgis.PyQt.QtWidgets import QDialog, QScroller
+
+from .setup.setup import Setup
+from ..utils.utils import Utils
+
+FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'find_location_dockwidget_base.ui'))
 
 class FindLocationDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
@@ -48,9 +52,25 @@ class FindLocationDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.setupUi(self)
 
 
-        setupDevice = SetupDevice(interface)
+        scroll = QScroller.scroller(self.scrollArea.viewport())
+        scroll.grabGesture(self.scrollArea.viewport(), QScroller.LeftMouseButtonGesture)
+
+        setupDevice = Setup(interface, 10)
+        setupDevice.inputChanged.connect(self.onInputChanged)
         self.geMainLayout.addWidget(setupDevice)
 
+    def onInputChanged(self, measurements):
+        for measurement in measurements:
+            QgsMessageLog.logMessage(str(measurement.satellitesUsed), 'LFB')
+            QgsMessageLog.logMessage(str(measurement.hdop), 'LFB')
+            QgsMessageLog.logMessage(str(measurement.pdop), 'LFB')
+            QgsMessageLog.logMessage(str(measurement.vdop), 'LFB')
+
     def closeEvent(self, event):
+        # when close dialog
+
+        # hide Layer
+        Utils.removeLayer(['lfb-tmp-position', 'lfb-tmp-distance'])
+       
         self.closingPlugin.emit()
         event.accept()

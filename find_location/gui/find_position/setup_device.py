@@ -1,15 +1,14 @@
 import math
 import os
 
+import sys
+sys.path.append("..")
+
 import pandas as pd
 
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QDialog
 from PyQt5 import QtCore
-from qgis.PyQt.QtCore import QSettings
-
-
-from ....utils.helper import Utils
 
 from qgis.core import QgsSettings, QgsApplication, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection
 
@@ -17,7 +16,7 @@ UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'setup_devi
 
 PLUGIN_NAME = "lfb_regeneration_wildlife_impact" #lfb_regeneration_wildlife_impact/pb_tool.cfg
 
-class SetupDevice(QtWidgets.QWidget, UI_CLASS):
+class SetupDevices(QtWidgets.QWidget, UI_CLASS):
     inputChanged = QtCore.pyqtSignal(object, str, bool)
 
     def __init__(self, interface, json, value, attr, inheritedErrors):
