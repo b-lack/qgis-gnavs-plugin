@@ -22,7 +22,6 @@ PLUGIN_NAME = "find_location"
 
 class Setup(QtWidgets.QWidget, UI_CLASS):
 
-    inputChanged = QtCore.pyqtSignal(object)
 
     def __init__(self, interface, bestCount=5):
         """Constructor."""
@@ -32,18 +31,26 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
         self.interface = interface
 
-        self.addRecording()
-        self.addNavigation()
+        self.rec = self.addRecording()
+        self.selection = self.addNavigation()
+
+    def __del__(self):
+        del self.rec
+
+    def stopTracking(self):
+        self.rec.stopTracking()
 
     def coordinatesChanged(self, gpsInfo):
         if self.selection is not None:
             self.selection.updateCoordinates(gpsInfo)
 
     def addRecording(self):
-        rec = Recording(self.interface)
+        rec = Recording(self.interface, 20)
         rec.currentPositionChanged.connect(self.coordinatesChanged)
         self.lfbSetup.addWidget(rec)
+        return rec
 
     def addNavigation(self):
-        self.selection = Selection(self.interface)
-        self.lfbSetup.addWidget(self.selection)
+        selection = Selection(self.interface)
+        self.lfbSetup.addWidget(selection)
+        return selection

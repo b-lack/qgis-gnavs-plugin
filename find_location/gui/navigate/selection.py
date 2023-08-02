@@ -28,10 +28,11 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         self.targets = None
         self.interface = interface
 
+        QgsMessageLog.logMessage('init', 'LFB')
+
         layers = Utils.selectLayerByType(QgsWkbTypes.PointGeometry)
         for layer in layers:
             layer.selectionChanged.connect(self.layerSelectionChanged)
-            QgsMessageLog.logMessage(layer.name(), 'LFB')
 
         self.layerSelectionChanged()
 
@@ -57,13 +58,14 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
             
             endXY = QgsPointXY(QgsPoint(self.gpsInfo.longitude, self.gpsInfo.latitude))
 
-            for feature in self.selectedFeatures:
-                geom = feature.geometry()
+            for element in self.selectedFeatures:
+                geom = element['feature'].geometry()
                 startXY = QgsPointXY(geom.asPoint())
                 
                 target = {
-                    'id': feature.id(),
-                    'feature': feature,
+                    'id': element['feature'].id(),
+                    'feature': element['feature'],
+                    'layer': element['layer'],
                     'startPoint': startXY,
                     'endPoint': endXY,
                     'distance': Utils.distanceFromPoints(startXY, endXY ),
@@ -83,8 +85,7 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
                 child.widget().deleteLater()
 
         
-
-        layer = Utils.getPrivateLayers('lfb-tmp-distance', 'linestring')
+        
         Utils.clearLayer('lfb-tmp-distance', 'linestring')
         
         if  self.targets is not None and len(self.targets) > 0:
@@ -94,10 +95,11 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
                 Utils.drawDistance('lfb-tmp-distance',targetElement['startPoint'], targetElement['endPoint'])
                 
         else:
-            for feature in self.selectedFeatures:
+            for element in self.selectedFeatures:
                 target = Target(self.interface, {
-                    'id': feature.id(),
-                    'feature': feature
+                    'id': element['feature'].id(),
+                    'feature': element['feature'],
+                    'layer': element['layer'],
                 })
                 self.lfbSelectedTargets.addWidget(target)
 
@@ -114,10 +116,12 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
 
     def layerSelectionChanged(self, selected=[''], deselected=[]):
 
-        if selected is None or len(selected) == 0:
-            self.selectedFeatures.clear()
-        else:
-            self.selectedFeatures = Utils.getSelectedFeaturesFromAllLayers(QgsWkbTypes.PointGeometry)
+        #if selected is None or len(selected) == 0:
+        #    self.selectedFeatures.clear()
+        #else:
+        self.selectedFeatures = Utils.getSelectedFeaturesFromAllLayers(QgsWkbTypes.PointGeometry)
+
+        
         
         self.updateSelectionLabel()
     

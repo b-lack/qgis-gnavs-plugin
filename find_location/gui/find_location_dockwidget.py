@@ -55,22 +55,22 @@ class FindLocationDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         scroll = QScroller.scroller(self.scrollArea.viewport())
         scroll.grabGesture(self.scrollArea.viewport(), QScroller.LeftMouseButtonGesture)
 
-        setupDevice = Setup(interface, 10)
-        setupDevice.inputChanged.connect(self.onInputChanged)
-        self.geMainLayout.addWidget(setupDevice)
+        self.setupDevice = Setup(interface, 10)
+        self.geMainLayout.addWidget(self.setupDevice)
 
-    def onInputChanged(self, measurements):
-        for measurement in measurements:
-            QgsMessageLog.logMessage(str(measurement.satellitesUsed), 'LFB')
-            QgsMessageLog.logMessage(str(measurement.hdop), 'LFB')
-            QgsMessageLog.logMessage(str(measurement.pdop), 'LFB')
-            QgsMessageLog.logMessage(str(measurement.vdop), 'LFB')
+        QgsMessageLog.logMessage('FindLocationDockWidget: __init__', 'LFB')
+
+    def openEvent(self, event):
+        QgsMessageLog.logMessage('FindLocationDockWidget: openEvent', 'LFB')
 
     def closeEvent(self, event):
-        # when close dialog
 
-        # hide Layer
+        # remove private Layers
         Utils.removeLayer(['lfb-tmp-position', 'lfb-tmp-distance'])
+        self.setupDevice.stopTracking()
+        # del self.setupDevice
+
+        QgsMessageLog.logMessage('FindLocationDockWidget: closeEvent', 'LFB')
        
         self.closingPlugin.emit()
         event.accept()

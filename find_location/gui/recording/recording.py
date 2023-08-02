@@ -43,20 +43,23 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbGetCoordinatesGtn.clicked.connect(self.connect)
         self.lfbGPSError.setText("")
-        self.lfbGPSState.setText("")
 
         self.lfbCancelCoordinatesBtn.clicked.connect(self.cancelConnection)
         self.lfbCancelCoordinatesBtn.setEnabled(False)
+        self.lfbCancelCoordinatesBtn.hide()
 
 
         self.updateSerialPortSelection()
+        self.lfbRefreshSerialListBtn.clicked.connect(self.updateSerialPortSelection)
         self.lfbSerialPortList.currentIndexChanged.connect(self.onSerialPortChanged)
-        self.geRefreshSerialListBtn.clicked.connect(self.updateSerialPortSelection)
+        
+
+        self.lfbRefreshSerialListBtn.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_BrowserReload))
 
         serialSetting = self.getGPSSettings()
         
         if serialSetting is None:
-            self.lfbGPSError = 'Wähle ein "Serielles Gerät" aus.'
+            self.lfbGPSError.setText("Kein GPS Gerät ausgewählt.")
         else:
             self.selectPort(serialSetting)
         
@@ -65,13 +68,18 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         #self.availablePorts = self.autoSelectPort()
         #self.tryNextPort()
 
+        self.lfbConnectLayout_2.hide()
+        self.lfbGPSError.hide()
 
-    def getSerialPorts(self):
-        return QgsGpsDetector.availablePorts()
+    def __del__(self):
+        print('Destructor called, Employee deleted.')
+
+    def stopTracking(self):
+        self.cancelConnection()
     
     def updateSerialPortSelection(self):
 
-        self.ports = self.getSerialPorts()
+        self.ports = Utils.getSerialPorts()
 
         self.lfbSerialPortList.clear()
         for port in self.ports:
@@ -81,29 +89,35 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         index = self.lfbSerialPortList.findData(port)
         if index != -1 :
             self.lfbSerialPortList.setCurrentIndex(index)
+        else:
+            self.lfbSerialPortList.setCurrentIndex(0)
+
+        self.onSerialPortChanged(self.lfbSerialPortList.currentIndex())
 
     def getGPSSettings(self):
         return QgsSettings().value('gps/gpsd-serial-device')
     
     def onSerialPortChanged(self, index):
+
         newPort = self.lfbSerialPortList.itemData(index)
         if newPort is None or newPort == 'None':
             return
         
-        #port  = self.lfbSerialPortList.itemData(index)
-        #self.connectionTest(port)
-    
         self.port = self.lfbSerialPortList.itemData(index)
-        QgsSettings().setValue('gps/gpsd-serial-device', self.port)
+        self.connectionTest(self.port)
+    
+        #self.port = self.lfbSerialPortList.itemData(index)
         
 
     def connectionTest(self, port):
         if port is None:
             self.geConnectionInfoLabel.setText('Wähle ein "Serielles Gerät" aus.')
+            self.geConnectionInfoLabel.setStyleSheet("color: red;")
             return
         
         self.geConnectionInfoLabel.setText("Teste Verbindung...")
-        QgsMessageLog.logMessage("Teste Verbindung..." + str(port), 'LFB')
+        self.geConnectionInfoLabel.setStyleSheet("color: gray;")
+        self.lfbSerialPortList.setEnabled(False)
 
         try:
             self.gpsDetectorTest.detected.disconnect(self.connectionTestSucceed)
@@ -121,6 +135,10 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
     def connectionTestFailed(self):
         
         self.geConnectionInfoLabel.setText("Verbindung fehlgeschlagen.")
+        self.geConnectionInfoLabel.setStyleSheet("color: red;")
+        self.lfbSerialPortList.setEnabled(True)
+        self.lfbGetCoordinatesGtn.setEnabled(False)
+        
         try:
             self.gpsDetectorTest.detected.disconnect(self.connectionTestSucceed)
             self.gpsDetectorTest.detectionFailed.disconnect(self.connectionTestFailed)
@@ -129,6 +147,11 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
     def connectionTestSucceed(self, connection):
         self.geConnectionInfoLabel.setText("Verbindung erfolgreich.")
+        self.geConnectionInfoLabel.setStyleSheet("color: green;")
+        self.lfbSerialPortList.setEnabled(True)
+        self.lfbGetCoordinatesGtn.setEnabled(True)
+
+        self.lfbConnectLayout_2.show()
 
         try:
             self.gpsDetectorTest.detected.disconnect(self.connectionTestSucceed)
@@ -136,10 +159,13 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         except:
             pass
 
-        self.connection_succeed(connection)
+        self.connection_succeed(connection, True)
+
 
     
     def connect(self, port):
+        QgsSettings().setValue('gps/gpsd-serial-device', self.port)
+
         if self.port is None:
             self.lfbGPSError.setText('Wähle ein "Serielles Gerät" aus.')
             return
@@ -150,8 +176,9 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             pass
         
         self.lfbGetCoordinatesGtn.setEnabled(False)
+        self.lfbGetCoordinatesGtn.hide()
+
         self.lfbGPSError.setText("")
-        self.lfbGPSState.setText('Verbindung zum GPS-Gerät am Port "' + self.port + '" wird hergestellt...')
 
         self.gpsDetector = QgsGpsDetector(self.port)
         self.gpsDetector.detected[QgsGpsConnection].connect(self.connection_succeed) #
@@ -159,9 +186,10 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.gpsDetector.advance()
 
     def cancelConnection(self):
+        QgsMessageLog.logMessage("cancelConnection", 'LFB')
 
-        QgsMessageLog.logMessage(str(self.gpsCon), 'LFB')
         try:
+            
             if self.gpsCon is not None:
                 self.gpsCon.stateChanged.disconnect(self.status_changed)
 
@@ -171,17 +199,20 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
            
 
             self.gps_active = False
-            #self.lfbGPSState.setText("Connection Cancelled")
             self.lfbCancelCoordinatesBtn.setEnabled(False)
+            self.lfbCancelCoordinatesBtn.hide()
+
             self.lfbGetCoordinatesGtn.setEnabled(True)
+            self.lfbGetCoordinatesGtn.show()
+
             self.measures = []
             self.setMeasurementsCount()
-            #self.lfbGPSState.setText("Keine Verbindung die geschlossen werden könnte.")
 
         except Exception as e:
-            self.lfbGPSError.setText(str(e))
+            pass
+            #self.lfbGPSError.setText(str(e))
 
-    def connection_succeed(self, connection):
+    def connection_succeed(self, connection, closeConnection=False):
 
         if self.gpsCon is not None:
             self.cancelConnection()
@@ -189,7 +220,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         # https://python.hotexamples.com/examples/PyQt5.QtSerialPort/QSerialPort/setDataBits/python-qserialport-setdatabits-method-examples.html
 
         if not isinstance(connection, QgsNmeaConnection):
-            QgsMessageLog.logMessage('is not QgsNmeaConnection', 'LFB')
             import sip
             self.gpsCon =  sip.cast(connection, QgsGpsConnection)
             #self.gpsCon = gpsConnection
@@ -197,35 +227,39 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         elif isinstance(connection, QgsGpsConnection):
             self.gpsCon = gpsConnection
         else:
-            self.lfbGPSState.setText("Es konnte keine Verbindung zum GPS-Gerät hergestellt werden.")
+            return
+        
+        if closeConnection:
+            self.cancelConnection()
             return
 
         try:
             
             self.lfbCancelCoordinatesBtn.setEnabled(True)
-            #self.gpsCon = connection
+            self.lfbCancelCoordinatesBtn.show()
+
             self.gpsCon.stateChanged.connect(self.status_changed)
             #self.gpsCon.positionChanged.connect(self.position_changed)
             
             self.gps_active = True
-            self.lfbGPSState.setText("Verbindung ist hergestellt.")
         except Exception as e:
              self.lfbGPSError.setText('connection_succeed:' + str(e))
 
+        
+
     def connection_failed(self):
-        self.lfbGPSState.setText("")
         self.lfbGPSError.setText('Es konnte keine Verbindung zum Port "' + self.port + '" hergestellt werden.')
         self.lfbGetCoordinatesGtn.setEnabled(True)
+        self.lfbGetCoordinatesGtn.show()
 
-    def position_changed(self, gpsInfo):
-        QgsMessageLog.logMessage('position_changed')
-        QgsMessageLog.logMessage(str(gpsInfo))
+    #def position_changed(self, gpsInfo):
+    #    QgsMessageLog.logMessage('position_changed')
+    #    QgsMessageLog.logMessage(str(gpsInfo))
 
     def status_changed(self, gpsInfo):
         
 
         try:
-            self.lfbGPSState.setText('Daten wurden erfolgreich ermittelt.')
             self.lfbGPSError.setText('')
             self.emitAggregatedValues(gpsInfo)
 
@@ -249,15 +283,15 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
 
         # Strip the list to 5 elements
-        self.measures = self.measures[:5]
+        #self.measures = self.measures[:5]
 
         self.setMeasurementsCount()
 
 
         
         if len(self.measures) >= self.bestCount:
-            self.inputChanged.emit(self.measures)
-            self.cancelConnection()
+            self.inputChanged.emit(self.measures[:self.bestCount])
+            #self.cancelConnection()
         else:
             self.currentPositionChanged.emit(GPSInfo)
 

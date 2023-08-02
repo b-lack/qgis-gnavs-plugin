@@ -29,7 +29,11 @@
    <item>
     <widget class="QGroupBox" name="lfbSelectionGroup">
      <property name="styleSheet">
-      <string notr="true"/>
+      <string notr="true">QGroupBox#lfbSelectionGroup{
+	background-color: transparent;
+	border: none;
+	padding-top:20px;
+}</string>
      </property>
      <property name="title">
       <string>Features Selected</string>

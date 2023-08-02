@@ -1,5 +1,5 @@
 from qgis import qgis
-from qgis.core import QgsSettings, QgsProject, QgsMessageLog, QgsDistanceArea, QgsExpressionContextUtils, QgsFeature, QgsMapLayer, QgsFields, QgsStyle, QgsGeometry, QgsField, QgsVectorLayer, QgsCoordinateReferenceSystem
+from qgis.core import QgsSettings, QgsProject, QgsMessageLog, QgsGpsDetector, QgsDistanceArea, QgsCoordinateTransform, QgsExpressionContextUtils, QgsFeature, QgsMapLayer, QgsFields, QgsStyle, QgsGeometry, QgsField, QgsVectorLayer, QgsCoordinateReferenceSystem
 from qgis.utils import iface
 from qgis.PyQt.QtCore import QVariant
 from PyQt5.QtGui import QColor
@@ -29,21 +29,50 @@ class Utils(object):
     def getPluginName():
         return PLUGIN_NAME
     
+    def getSerialPorts():
+        ports = QgsGpsDetector.availablePorts()
+        return ports
+    
     def distanceFromPoints(point1, point2):
         distance = QgsDistanceArea()
         units = distance.lengthUnits()
-        QgsMessageLog.logMessage('units: ' + str(units), 'LFB')
         distance.setEllipsoid('WGS84')
         return distance.measureLine(point1, point2)
     
     def bearingFromPoints(point1, point2):
         distance = QgsDistanceArea()
         units = distance.lengthUnits()
-        QgsMessageLog.logMessage('units: ' + str(units), 'LFB')
         distance.setEllipsoid('WGS84')
         return distance.bearing(point1, point2)
         
+    def deselectFeature(layer, feature):
+        layer.deselect(feature.id())
+
+    def fokusToFeature(feature):
+        iface.mapCanvas().zoomToFeatureExtent(feature.geometry().boundingBox())
+
+    def transformCoordinates(geom):
+        crs = QgsProject.instance().crs().authid()
     
+        sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
+        destCrs = QgsCoordinateReferenceSystem(crs)
+
+        tr = QgsCoordinateTransform(sourceCrs, destCrs, QgsProject.instance())
+        geom.transform(tr)
+        return geom
+
+    def centerFeature(feature, zoom = 150000):
+        geom = feature.geometry()
+        coordinates = geom.asPoint()
+
+        geom = Utils.transformCoordinates(geom)
+
+        coordinates = geom.asPoint()
+        iface.mapCanvas().setCenter(coordinates)
+        
+        current_scale =  iface.mapCanvas().scale()
+        iface.mapCanvas().zoomScale(min(zoom, current_scale))
+
     # QgsWkbTypes.PointGeometry
     def getSelectedFeaturesFromAllLayers(geometryType):
 
@@ -53,7 +82,12 @@ class Utils(object):
         
         for layer in layers:
             if layer.selectedFeatureCount() > 0:
-                features = features + layer.selectedFeatures()
+                for feature in layer.selectedFeatures():
+                    features.append({
+                        'layer': layer,
+                        'feature': feature
+                    })
+                #features = features + layer.selectedFeatures()
                 #features.append(layer.selectedFeatures())
 
         return features
@@ -92,7 +126,7 @@ class Utils(object):
             renderer.setSymbol(style)
         
         elif type == 'linestring':
-            symbol.setColor(QColor(255,255,1))
+            symbol.setColor(QColor(255,255,1, 155))
             symbol.setWidth(1)
 
         #symbol.symbolLayer(0).setStrokeColor(QColor(255,255,1))
