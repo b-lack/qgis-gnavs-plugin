@@ -72,7 +72,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.lfbGPSError.hide()
 
     def __del__(self):
-        print('Destructor called, Employee deleted.')
+        pass
 
     def stopTracking(self):
         self.cancelConnection()
@@ -257,7 +257,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
     #    QgsMessageLog.logMessage(str(gpsInfo))
 
     def status_changed(self, gpsInfo):
-        
 
         try:
             self.lfbGPSError.setText('')
@@ -274,6 +273,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         if not GPSInfo.isValid():
             QgsMessageLog.logMessage('GPSInfo is not valid', 'LFB')
             return
+        
+        QgsMessageLog.logMessage(str(GPSInfo), 'LFB')
         
         self.measures.insert(0, GPSInfo)
 

@@ -32,6 +32,7 @@ from qgis.core import QgsMessageLog
 from qgis.PyQt.QtWidgets import QDialog, QScroller
 
 from .setup.setup import Setup
+from .setup.settings import Settings
 from ..utils.utils import Utils
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'find_location_dockwidget_base.ui'))
@@ -58,10 +59,35 @@ class FindLocationDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.setupDevice = Setup(interface, 10)
         self.geMainLayout.addWidget(self.setupDevice)
 
-        QgsMessageLog.logMessage('FindLocationDockWidget: __init__', 'LFB')
+        self.Settings = Settings(interface, 10)
+        self.geMainLayout.addWidget(self.Settings)
 
-    def openEvent(self, event):
-        QgsMessageLog.logMessage('FindLocationDockWidget: openEvent', 'LFB')
+        self.lfbHomeBtn.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_ArrowLeft))
+        self.lfbHomeBtn.clicked.connect(self.toHome)
+
+        self.lfbSettingsBtn.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MessageBoxInformation))
+        self.lfbSettingsBtn.clicked.connect(self.toSettings)
+
+        self.toHome()
+
+    def toHome(self):
+        self.lfbHomeBtn.hide()
+        self.lfbSettingsBtn.show()
+
+        self.setupDevice.show()
+        self.Settings.hide()
+
+        self.lfbHeadlineLabel.setText('Find Location')
+    
+    def toSettings(self):
+        self.lfbHomeBtn.show()
+        self.lfbSettingsBtn.hide()
+
+        self.setupDevice.hide()
+        self.Settings.show()
+
+        self.lfbHeadlineLabel.setText('Settings')
+
 
     def closeEvent(self, event):
 

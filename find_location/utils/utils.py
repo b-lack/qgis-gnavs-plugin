@@ -26,6 +26,17 @@ class Utils(object):
         s=QgsSettings()
         return s.setValue(Utils.getPluginName()+"/serialPort", serialPort)
     
+    def getSetting(name, default):
+        setting = QgsSettings().value(Utils.getPluginName()+"/" + name)
+        if setting == None:
+            Utils.setSetting(name, default)
+            return default
+        return setting
+    
+    def setSetting(name, value):
+        QgsSettings().setValue(Utils.getPluginName()+"/" + name, value)
+        return
+    
     def getPluginName():
         return PLUGIN_NAME
     
