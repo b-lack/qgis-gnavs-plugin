@@ -102,7 +102,7 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         defaultItems = [
             {"name": "PDOP", "value": "pdop", "direction": True},
             {"name": "HDOP", "value": "hdop", "direction": True},
-            {"name": "Satellite Count", "value": "satellitesUsed", "direction": False},
+            {"name": "Satellite Count", "value": "satellitesUsed", "direction": False}
         ]
 
         self.items = json.loads(Utils.getSetting('sortingValues', json.dumps(defaultItems)))

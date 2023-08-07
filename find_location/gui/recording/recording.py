@@ -6,9 +6,7 @@ from qgis.PyQt.QtWidgets import QDialog
 from PyQt5 import QtCore
 from qgis.PyQt.QtCore import QSettings
 
-from qgis.core import QgsSettings, QgsWkbTypes, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection
-
-import pandas as pd
+from qgis.core import QgsSettings, QgsApplication, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection
 
 from ...utils.utils import Utils
 
@@ -68,7 +66,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         #self.availablePorts = self.autoSelectPort()
         #self.tryNextPort()
 
-        self.lfbConnectLayout_2.hide()
+        #self.lfbConnectLayout_2.hide()
         self.lfbGPSError.hide()
 
     def __del__(self):
@@ -98,16 +96,34 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         return QgsSettings().value('gps/gpsd-serial-device')
     
     def onSerialPortChanged(self, index):
+        self.geConnectionInfoLabel.setText("")
+        QgsMessageLog.logMessage("onSerialPortChanged", )
 
         newPort = self.lfbSerialPortList.itemData(index)
         if newPort is None or newPort == 'None':
+            self.geConnectionInfoLabel.setText("Wähle ein 'Serielles Gerät' aus.")
             return
         
         self.port = self.lfbSerialPortList.itemData(index)
-        self.connectionTest(self.port)
+        
+        #self.connectionTest(self.port)
     
         #self.port = self.lfbSerialPortList.itemData(index)
+    
+    def connectionEstablished(self):
+        connectionRegistry = QgsApplication.gpsConnectionRegistry()
+        connectionList = connectionRegistry.connectionList()
+
+        if len(connectionList) > 0:
+            return connectionList[0]
+
+        return None
         
+        #GPSInfo = connectionList[0].currentGPSInformation()
+
+        if len(connectionList) > 0:
+            #self.connection_succeed(connectionList[0], False)
+            return True
 
     def connectionTest(self, port):
         if port is None:
@@ -166,8 +182,14 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
     def connect(self, port):
         QgsSettings().setValue('gps/gpsd-serial-device', self.port)
 
+        connection = self.connectionEstablished()
+        if connection is not None:
+            self.connection_succeed(connection, False)
+            self.geConnectionInfoLabel.setText('Connection exists.')
+            return
+
         if self.port is None:
-            self.lfbGPSError.setText('Wähle ein "Serielles Gerät" aus.')
+            self.geConnectionInfoLabel.setText('Wähle ein "Serielles Gerät" aus.')
             return
         try:
             self.gpsDetector.detected[QgsGpsConnection].disconnect(self.connection_succeed)
@@ -175,15 +197,14 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         except:
             pass
         
-        self.lfbGetCoordinatesGtn.setEnabled(False)
-        self.lfbGetCoordinatesGtn.hide()
-
-        self.lfbGPSError.setText("")
+        #self.lfbGetCoordinatesGtn.setEnabled(False)
+        #self.lfbGetCoordinatesGtn.hide()
 
         self.gpsDetector = QgsGpsDetector(self.port)
         self.gpsDetector.detected[QgsGpsConnection].connect(self.connection_succeed) #
         self.gpsDetector.detectionFailed.connect(self.connection_failed)
         self.gpsDetector.advance()
+
 
     def cancelConnection(self):
         QgsMessageLog.logMessage("cancelConnection", 'LFB')
@@ -225,7 +246,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             #self.gpsCon = gpsConnection
 
         elif isinstance(connection, QgsGpsConnection):
-            self.gpsCon = gpsConnection
+            self.gpsCon = connection
         else:
             return
         
@@ -248,7 +269,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         
 
     def connection_failed(self):
-        self.lfbGPSError.setText('Es konnte keine Verbindung zum Port "' + self.port + '" hergestellt werden.')
+        self.geConnectionInfoLabel.setText('Es konnte keine Verbindung zum Port "' + self.port + '" hergestellt werden.')
         self.lfbGetCoordinatesGtn.setEnabled(True)
         self.lfbGetCoordinatesGtn.show()
 
@@ -274,7 +295,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             QgsMessageLog.logMessage('GPSInfo is not valid', 'LFB')
             return
         
-        QgsMessageLog.logMessage(str(GPSInfo), 'LFB')
+
+        QgsMessageLog.logMessage(str(GPSInfo.latitude), 'LFB')
         
         self.measures.insert(0, GPSInfo)
 
