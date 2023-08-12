@@ -1,4 +1,4 @@
-# search-find-qgis-plugin
+# search-gnavs-plugin
 
 
 ## Installation from Repository
@@ -8,7 +8,7 @@ QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``Settings``
 In the **Plugin Repositories** section click `+Add`.
 
 - Name: `Find and Search Plugin`
-- URL: `https://raw.githubusercontent.com/b-lack/search-find-qgis-plugin/main/plugins.xml`
+- URL: `https://raw.githubusercontent.com/b-lack/search-gnavs-plugin/main/plugins.xml`
 
 Check: "Allow experimental plugins"
 
