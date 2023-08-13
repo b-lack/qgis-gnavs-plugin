@@ -34,6 +34,7 @@ from qgis.PyQt.QtWidgets import QDialog, QScroller
 from .setup.setup import Setup
 from .setup.settings import Settings
 from ..utils.utils import Utils
+from .recording.toggle_buttons import ToggleButtons
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'gnavs_dockwidget_base.ui'))
 
@@ -53,8 +54,8 @@ class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.setupUi(self)
 
 
-        scroll = QScroller.scroller(self.scrollArea.viewport())
-        scroll.grabGesture(self.scrollArea.viewport(), QScroller.LeftMouseButtonGesture)
+        scroll = QScroller.scroller(self.lfbScrollArea.viewport())
+        scroll.grabGesture(self.lfbScrollArea.viewport(), QScroller.LeftMouseButtonGesture)
 
         self.setupDevice = Setup(interface, 10)
         self.geMainLayout.addWidget(self.setupDevice)
@@ -62,32 +63,51 @@ class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.Settings = Settings(interface, 10)
         self.geMainLayout.addWidget(self.Settings)
 
-        self.lfbHomeBtn.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_ArrowLeft))
-        self.lfbHomeBtn.clicked.connect(self.toHome)
+        #self.lfbHomeBtn.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_ArrowLeft))
+        #self.lfbHomeBtn.clicked.connect(self.toHome)
 
-        self.lfbSettingsBtn.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MessageBoxInformation))
-        self.lfbSettingsBtn.clicked.connect(self.toSettings)
+        #self.lfbSettingsBtn.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MessageBoxInformation))
+        #self.lfbSettingsBtn.clicked.connect(self.toSettings)
+
+        toggleButtons = ToggleButtons(interface)
+        toggleButtons.change.connect(self.toggleButtonsChanged)
+        self.lfbMenuBarLayout.insertWidget(0, toggleButtons)
+
+        
+
+        self.lfbAddToMapBtn.clicked.connect(self.setupDevice.addDataToMap)
 
         self.toHome()
+        self.toggleButtonsChanged('navigation')
+
+    def toggleButtonsChanged(self, state):
+        if state == 'settings':
+            self.toSettings()
+        else:
+            self.toHome()
+
+        self.setupDevice.toggleButtonsChanged(state)
+
+        if state == 'point':
+            self.lfbAddToMapWidget.show()
+        else:
+            self.lfbAddToMapWidget.hide()
 
     def toHome(self):
-        self.lfbHomeBtn.hide()
-        self.lfbSettingsBtn.show()
+        #self.lfbHomeBtn.hide()
+        #self.lfbSettingsBtn.show()
 
         self.setupDevice.show()
         self.Settings.hide()
+        #self.setupDevice.stateChanged(state)
 
-        self.lfbHeadlineLabel.setText('')
     
     def toSettings(self):
-        self.lfbHomeBtn.show()
-        self.lfbSettingsBtn.hide()
+        #self.lfbHomeBtn.show()
+        #self.lfbSettingsBtn.hide()
 
         self.setupDevice.hide()
         self.Settings.show()
-
-        self.lfbHeadlineLabel.setText('Settings')
-
 
     def closeEvent(self, event):
 

@@ -1,7 +1,7 @@
 import json
 
 from qgis import qgis
-from qgis.core import QgsSettings, QgsPoint, QgsPointXY, QgsProject, QgsMessageLog, QgsGpsDetector, QgsDistanceArea, QgsCoordinateTransform, QgsExpressionContextUtils, QgsFeature, QgsMapLayer, QgsFields, QgsStyle, QgsGeometry, QgsField, QgsVectorLayer, QgsCoordinateReferenceSystem
+from qgis.core import QgsSettings, QgsLayerTreeLayer, QgsPoint, QgsPointXY, QgsProject, QgsMessageLog, QgsGpsDetector, QgsDistanceArea, QgsCoordinateTransform, QgsExpressionContextUtils, QgsFeature, QgsMapLayer, QgsFields, QgsStyle, QgsGeometry, QgsField, QgsVectorLayer, QgsCoordinateReferenceSystem
 from qgis.utils import iface
 from qgis.PyQt.QtCore import QVariant, QDateTime
 from PyQt5.QtGui import QColor
@@ -100,6 +100,11 @@ class Utils(object):
 
     def fokusToFeature(feature):
         iface.mapCanvas().zoomToFeatureExtent(feature.geometry().boundingBox())
+    
+    def focusToXY(x, y, zoom = 150000):
+        iface.mapCanvas().setCenter(QgsPointXY(x, y))
+        #current_scale =  iface.mapCanvas().scale()
+        #iface.mapCanvas().zoomScale(min(zoom, current_scale))
 
     def transformCoordinates(geom):
         crs = QgsProject.instance().crs().authid()
@@ -204,8 +209,6 @@ class Utils(object):
             dp = vl.dataProvider()
             dp.addAttributes(fields)
             vl.updateFields()
-            QgsMessageLog.logMessage('fields added', 'LFB')
-            QgsMessageLog.logMessage(str(fields), 'LFB')
 
         QgsProject.instance().addMapLayer(vl)
 
@@ -232,6 +235,68 @@ class Utils(object):
         for layer in layers:
             if QgsExpressionContextUtils.layerScope(layer).variable('LFB-NAME') in layerNames :
                 QgsProject.instance().removeMapLayer(layer.id())
+
+    def layersToTop(layerNames):
+
+        return
+
+        registry = QgsProject.instance()
+
+        layers = list(registry.mapLayers().values())
+
+        root = registry.layerTreeRoot()
+
+        for layer in layers:
+            if QgsExpressionContextUtils.layerScope(layer).variable('LFB-NAME') in layerNames :
+                QgsMessageLog.logMessage(str(layer.id()), 'LFB')
+                clone_layer = layer.clone()
+                QgsProject.instance().removeMapLayer(layer.id())
+                root.insertLayer(0, clone_layer)
+
+       # root.insertLayer(0, layers[0])
+
+        return
+
+        layers = QgsProject.instance().mapLayers().values()
+
+        root = QgsProject.instance().layerTreeRoot()
+
+        for layer in layers:
+            if QgsExpressionContextUtils.layerScope(layer).variable('LFB-NAME') in layerNames :
+                layerClone = layer.clone()
+                id = layer.id()
+                root.insertChildNode(0, QgsLayerTreeLayer(layerClone))
+                QgsProject.instance().removeMapLayer(id)
+        
+        return
+
+        rg = iface.layerTreeCanvasBridge().rootGroup()
+        if rg.hasCustomLayerOrder():
+            QgsMessageLog.logMessage(str('hasCustomLayerOrder'), 'LFB')
+            order = rg.customLayerOrder()
+            for layer in layers: # How many layers we need to move
+                QgsMessageLog.logMessage(str(layer.id()), 'LFB')
+                if QgsExpressionContextUtils.layerScope(layer).variable('LFB-NAME') in layerNames :
+                    order.insert( 0, order.pop( order.index( layer.id() ) ) )
+
+            rg.setCustomLayerOrder( order )
+        return
+        layers = QgsProject.instance().mapLayers().values()
+
+        bridge = iface.layerTreeCanvasBridge()
+       
+
+        for layer in layers:
+            if QgsExpressionContextUtils.layerScope(layer).variable('LFB-NAME') in layerNames :
+                
+                order = bridge.rootGroup().customLayerOrder()
+                order.insert( 0, order.pop( order.index( layer.id() ) ) ) # vlayer to the top
+                bridge.setCustomLayerOrder( order )
+                #order.insert(0, layerClone )
+                #QgsProject.instance().removeMapLayer(layer.id())
+                #QgsProject.instance().layerTreeRoot().moveLayer(layer, 0)
+
+        iface.layerTreeCanvasBridge().setCustomLayerOrder( order )
 
     def drawDistance(layerName, startPoint, endPoint):
         layer = Utils.getPrivateLayers(layerName, 'linestring')
@@ -279,7 +344,6 @@ class Utils(object):
 
     def addPointToLayer(layerName, aggregatedValues, gpsInfos):
 
-        QgsMessageLog.logMessage(str(aggregatedValues), 'LFB')
 
         fields = Utils.getGPSInfoFields()
         layer = Utils.getPrivateLayers(layerName, 'point', False, False, fields)

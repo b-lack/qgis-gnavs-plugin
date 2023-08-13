@@ -5,7 +5,7 @@ import json
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QDialog, QListWidgetItem
 from PyQt5 import QtCore, QtGui
-from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtCore import QTimer, QSettings
 
 from qgis.core import  QgsMessageLog
 
@@ -27,7 +27,8 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         self.setupUi(self)
 
         self.interface = interface
-
+        self.connectionTimer = QTimer()
+        self.connectionTimer.setSingleShot(True)
 
         # Degrees
         self.degUnits = [
@@ -103,8 +104,9 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
             {"name": "PDOP", "value": "pdop", "direction": True},
             {"name": "HDOP", "value": "hdop", "direction": True},
             {"name": "Satellite Count", "value": "satellitesUsed", "direction": False},
-            {"name": "Date Time", "value": "utcDateTime", "direction": False}, # False: Älteste zuerst
-            {"name": "Altitude [m]", "value": "elevation", "direction": True}
+            #{"name": "Date Time", "value": "utcDateTime", "direction": False}, # False: Älteste zuerst
+            {"name": "Elevation", "value": "elevation", "direction": True},
+            {"name": "Quality", "value": "quality", "direction": True},
         ]
 
         self.items = json.loads(Utils.getSetting('sortingValues', json.dumps(self.defaultSorting)))
@@ -167,6 +169,11 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         self.items = self.defaultSorting
         self.addItemsToList()
 
+    def saveSorting(self):
+        Utils.setSetting('sortingValues', json.dumps(self.items))
+        
+        
+
     def addItemsToList(self):
 
         self.lfbGpsInfoSortingList.clear()
@@ -175,7 +182,9 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
             item = QListWidgetItem(itemText['name'])
             self.lfbGpsInfoSortingList.addItem(item)
 
-        Utils.setSetting('sortingValues', json.dumps(self.items))
+        #Utils.setSetting('sortingValues', json.dumps(self.items))
+        self.connectionTimer.timeout.connect(self.saveSorting)
+        self.connectionTimer.start(1000)
 
     def itemSelected(self):
         self.lfbSortUpBtn.setEnabled(True)
@@ -195,22 +204,21 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
 
     def sortUp(self):
 
+        QgsMessageLog.logMessage(str( 'UP0' ),'LFB')
         self.selectedItem = self.lfbGpsInfoSortingList.currentItem()
 
         if self.selectedItem == None:
             return
         
         pos, item = self.findItemPosition(self.selectedItem.text())
-                
         newPosition = max(0, pos - 1)
         del self.items[pos]
         self.items.insert(newPosition, item)
-
         self.addItemsToList()
-
         self.lfbGpsInfoSortingList.setCurrentRow( newPosition )
-
         self.checkButtons()
+
+        QgsMessageLog.logMessage(str( 'UP1' ),'LFB')
     
     def sortDown(self):
 

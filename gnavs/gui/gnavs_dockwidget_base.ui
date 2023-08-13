@@ -6,20 +6,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1011</width>
-    <height>588</height>
+    <width>1033</width>
+    <height>614</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>150</width>
-    <height>113</height>
+    <height>223</height>
    </size>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
+  <property name="windowFilePath">
+   <string/>
   </property>
   <property name="windowTitle">
    <string>GNAVS - GNSS Navigate and Save</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
+   <property name="styleSheet">
+    <string notr="true">QScrollArea#lfbScrollArea{
+	background-color: #ddd;
+}</string>
+   </property>
    <layout class="QGridLayout" name="gridLayout">
     <property name="leftMargin">
      <number>0</number>
@@ -34,104 +45,141 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="QScrollArea" name="scrollArea">
-      <property name="tabletTracking">
-       <bool>true</bool>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
       </property>
-      <property name="styleSheet">
-       <string notr="true"/>
+      <property name="topMargin">
+       <number>0</number>
       </property>
-      <property name="widgetResizable">
-       <bool>true</bool>
+      <property name="bottomMargin">
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="scrollAreaWidgetContents">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>0</y>
-         <width>1009</width>
-         <height>560</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <property name="spacing">
+      <item>
+       <widget class="QWidget" name="lfbMenuBar" native="true">
+        <property name="styleSheet">
+         <string notr="true">background-color:#eee;
+border-bottom: 1px solid #888;</string>
+        </property>
+        <layout class="QHBoxLayout" name="lfbMenuBarLayout">
+         <property name="spacing">
+          <number>5</number>
+         </property>
+         <property name="leftMargin">
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QScrollArea" name="lfbScrollArea">
+        <property name="tabletTracking">
+         <bool>true</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: none;
+</string>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>1031</width>
+           <height>526</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout">
+          <property name="leftMargin">
            <number>0</number>
           </property>
           <property name="topMargin">
            <number>0</number>
           </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
-           <widget class="QToolButton" name="lfbHomeBtn">
-            <property name="styleSheet">
-             <string notr="true">background:transparent;
-border:none;</string>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
+           <layout class="QVBoxLayout" name="geMainLayout"/>
           </item>
           <item>
-           <widget class="QLabel" name="lfbHeadlineLabel">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Settings</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="horizontalSpacer">
+           <spacer name="verticalSpacer">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Vertical</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>40</width>
-              <height>20</height>
+              <width>20</width>
+              <height>40</height>
              </size>
             </property>
            </spacer>
           </item>
-          <item>
-           <widget class="QToolButton" name="lfbSettingsBtn">
-            <property name="styleSheet">
-             <string notr="true">background:transparent;
-border:none;</string>
-            </property>
-            <property name="text">
-             <string>...</string>
-            </property>
-           </widget>
-          </item>
          </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="geMainLayout"/>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-     </widget>
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="lfbAddToMapWidget" native="true">
+        <property name="styleSheet">
+         <string notr="true">background-color:#eee;
+border-top: 1px solid #888;</string>
+        </property>
+        <layout class="QHBoxLayout" name="lfbAddToMap">
+         <property name="leftMargin">
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
+          <number>5</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="lfbAddToMapBtn">
+           <property name="styleSheet">
+            <string notr="true">QPushButton{
+	border: 2px solid #333;
+	color: #555;
+	padding: 5px;
+	margin: 5px;
+}
+QPushButton:hover{
+	background-color: yellow;
+}
+QPushButton:enabled{
+	border:  2px solid green;
+	background-color: green;
+	color: #fff;
+}</string>
+           </property>
+           <property name="text">
+            <string>ADD TO MAP</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

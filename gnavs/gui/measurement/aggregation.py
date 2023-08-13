@@ -30,13 +30,18 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         QDialog.__init__(self, interface.mainWindow())
         self.setupUi(self)
 
-        self.lfbAddToMapBtn.clicked.connect(self.emitData)
+        #self.lfbAddToMapBtn.clicked.connect(self.emitData)
         self.lfbAddToMapBtn.setEnabled(False)
+
+        self.lfbAddToMapWidget.hide()
 
     def emitData(self):
         self.getTextFields()
         self.lfbAddToMapBtn.setEnabled(False)
-        self.addToMap.emit(self.aggregatedValues, self.gpsInfos)
+
+        Utils.addPointToLayer('lfb-gnavs-aggregated', self.aggregatedValues, self.gpsInfos)
+
+        #self.addToMap.emit(self.aggregatedValues, self.gpsInfos)
         self.reset()
 
     def updateAggregatedValues(self, gpsInfos):
@@ -85,7 +90,7 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
                 'name': '',
                 'description': '',
                 'device': '',
-            }
+            }, True
         )
 
     def aggregate(self, GPSInfos):
@@ -151,7 +156,7 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         self.aggregatedValues['name'] = self.lfbGPSName.text()
         self.aggregatedValues['description'] = self.lfbGPSDescription.toPlainText()
 
-    def printAggregatedValues(self, aggregatedValues):
+    def printAggregatedValues(self, aggregatedValues, clear=False):
         #self.lfbGPSCount.setText( str(aggregatedValues['measurementLength']) )
         self.lfbGPSCountBest.setText( str(aggregatedValues['measurementsUsedCount']) )
         self.lfbGPSLat.setText( str(round(aggregatedValues['latitude'], 8)) ) # 1.11 mm
@@ -162,6 +167,7 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         self.lfbGPSvDop.setText( str(round(aggregatedValues['vdop'], 2)) )
         self.lfbGPShDop.setText( str(round(aggregatedValues['hdop'], 2)) )
 
-        self.lfbGPSDescription.setPlainText( aggregatedValues['description'] )
-        self.lfbGPSName.setText( aggregatedValues['name'] )
-        self.lfbGPSDevice.setText( aggregatedValues['device'] )
+        if clear:
+            self.lfbGPSDescription.setPlainText( aggregatedValues['description'] )
+            self.lfbGPSName.setText( aggregatedValues['name'] )
+            self.lfbGPSDevice.setText( aggregatedValues['device'] )

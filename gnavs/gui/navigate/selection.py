@@ -28,13 +28,24 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         self.targets = None
         self.interface = interface
 
-        QgsMessageLog.logMessage('init', 'LFB')
+        self.updateToC()
+
+    def updateToC(self):
 
         layers = Utils.selectLayerByType(QgsWkbTypes.PointGeometry)
+
         for layer in layers:
+
+            try:
+                layer.selectionChanged.disconnect(self.layerSelectionChanged)
+            except:
+                pass
+
             layer.selectionChanged.connect(self.layerSelectionChanged)
 
         self.layerSelectionChanged()
+        QgsMessageLog.logMessage('updateToC', 'LFB')
+
 
     def updateCoordinates(self, gpsInfo):
         if gpsInfo is None or gpsInfo.latitude is None or gpsInfo.longitude is None:

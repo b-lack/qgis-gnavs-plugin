@@ -39,14 +39,16 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.measurementEnd = None
 
         self.gpsCon = None
+        self.lastGPSInfo = None
+        self.keepFocus = False
 
         if aggregate:
             self.recordingStyle = 'point'
-            self.lfbGetCoordinatesGtn.setText("AUFZEICHNEN")
+            self.lfbGetCoordinatesGtn.setText("START")
             self.lfbCancelCoordinatesBtn.setText("BEENDEN")
         else:
             self.recordingStyle = 'navigation'
-            self.lfbGetCoordinatesGtn.setText("NAVIGIEREN")
+            self.lfbGetCoordinatesGtn.setText("START")
             self.lfbCancelCoordinatesBtn.setText("BEENDEN")
 
         try:
@@ -87,7 +89,18 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.recordingStyle = value
         self.cangeState()
 
+    def focusQuick(self):
+        self.setFocus()
+    
+    def toggleFocus(self, isNavigation):
+        self.keepFocus = isNavigation
+
+    def setFocus(self):
+        if self.lastGPSInfo is not None:
+            Utils.focusToXY(self.lastGPSInfo.longitude, self.lastGPSInfo.latitude)
+
     def cangeState(self):
+        return
         if self.recordingStyle == 'navigation':
             self.lfbGetCoordinatesGtn.setText("NAVIGIEREN")
             self.lfbCancelCoordinatesBtn.setText("BEENDEN")
@@ -343,6 +356,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
     def status_changed(self, gpsInfo):
 
         quality = gpsInfo.quality
+        quaityIndicator = gpsInfo.qualityIndicator
+        QgsMessageLog.logMessage('GPSInfo: ' + str(quality) + ' ' + str(quaityIndicator), 'LFB')
 
         try:
             if quality == 0:
@@ -354,6 +369,11 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             else:
                 self.lfbValidIndicator.setStyleSheet("background-color: green; border-radius: 5px;")
 
+            self.lastGPSInfo = gpsInfo
+
+            if self.keepFocus:
+                self.setFocus()
+                
             self.emitAggregatedValues(gpsInfo)
         except Exception as e:
            self.geConnectionInfoLabel.setText(str(e))

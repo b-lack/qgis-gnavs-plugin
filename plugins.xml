@@ -4,18 +4,18 @@
         <description><![CDATA[Find Location]]></description>
         <version>0.0.1</version>
         <qgis_minimum_version>3.0</qgis_minimum_version>
-        <homepage>https://github.com/b-lack/search-gnavs-plugin</homepage>
+        <homepage>https://github.com/b-lack/qgis-gnavs-plugin</homepage>
         <file_name>gnavs.zip</file_name>
-        <icon>assets/icon.png</icon>
+        <icon>gnavs/assets/icon.png</icon>
         <author_name>Torsten Wiebke (Concept), Gerrit Balindt (Development)</author_name>
-        <download_url>https://github.com/b-lack/search-gnavs-plugin/raw/main/find_location/zip_build/gnavs.zip</download_url>
+        <download_url>https://github.com/b-lack/qgis-gnavs-plugin/raw/main/qgis-gnavs-plugin/zip_build/gnavs.zip</download_url>
         <uploaded_by>Grünecho</uploaded_by>
-        <create_date>2023-06-30</create_date>
-        <update_date>2023-06-30</update_date>
+        <create_date>2023-08-30</create_date>
+        <update_date>2023-08-30</update_date>
         <experimental>True</experimental>
         <deprecated>False</deprecated>
-        <tracker>https://github.com/b-lack/search-gnavs-plugin/issues</tracker>
-        <repository>https://github.com/b-lack/search-gnavs-plugin</repository>
+        <tracker>https://github.com/b-lack/qgis-gnavs-plugin/issues</tracker>
+        <repository>https://github.com/b-lack/qgis-gnavs-pluginn</repository>
         <tags>python, navigation, forestry</tags>
     </pyqgis_plugin>
 </plugins>
