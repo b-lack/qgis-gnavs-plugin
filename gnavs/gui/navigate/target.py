@@ -3,7 +3,7 @@ import os
 import math
 
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtWidgets import QDialog, QScroller
+from qgis.PyQt.QtWidgets import QDialog, QScroller, QTableWidgetItem
 from PyQt5 import QtCore
 
 from qgis.core import QgsSettings, QgsApplication, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection
@@ -24,15 +24,15 @@ class Target(QtWidgets.QWidget, UI_CLASS):
         self.interface = interface
         self.targetElement = targetElement
 
-        scroll = QScroller.scroller(self.lfbAttributesLine.viewport())
-        scroll.grabGesture(self.lfbAttributesLine.viewport(), QScroller.LeftMouseButtonGesture)
+        #scroll = QScroller.scroller(self.lfbAttributesLine.viewport())
+        #scroll.grabGesture(self.lfbAttributesLine.viewport(), QScroller.LeftMouseButtonGesture)
 
         self.lfbTargetRemoveBtn.clicked.connect(self.removeTargetSelection)
         self.lfbTargetFokusBtn.clicked.connect(self.fokusToTarget)
 
 
         self.updateValues()
-        self.updateAttributesList()
+        self.updateAttributeTableView()
 
     def removeTargetSelection(self):
         Utils.deselectFeature(self.targetElement['layer'], self.targetElement['feature'])
@@ -51,21 +51,45 @@ class Target(QtWidgets.QWidget, UI_CLASS):
         for i, attr in enumerate(attrs):
             label = QtWidgets.QLabel(field_names[i] + ': ' + str(attr))
             self.lfbAttributeLayout.addWidget(label)
+
+    def updateAttributeTableView(self):
+        feature = self.targetElement['feature']
+        attrs = feature.attributes()
+
+        provider = self.targetElement['layer'].dataProvider()
+        field_names = [field.name() for field in provider.fields()]
+
+        self.lfbAttributeTableWidget.horizontalHeader().setStretchLastSection(True)
+        columns = len(field_names)
+        self.lfbAttributeTableWidget.setColumnCount(columns)
+
+        for i in range(columns):
+            self.lfbAttributeTableWidget.setHorizontalHeaderItem(i, QTableWidgetItem(field_names[i]))
+
+        
+
+        for i, attr in enumerate(attrs):
+            item = QTableWidgetItem(str(attr))
+            item.setTextAlignment(QtCore.Qt.AlignCenter)
+            self.lfbAttributeTableWidget.setItem(0 , i, item)
     
     def updateValues(self):
 
         if 'distance' in self.targetElement:
-            self.lfbDistanceLayout_2.show()
+            #self.lfbTargetDetailsWidget.show()
             if self.targetElement['distance'] > 1000:
                 self.lfbDistanceEdit.setText(str(round(self.targetElement['distance']/1000, 2)))
                 self.lfbDistanceUnit.setText("km")
-            else:
+            elif self.targetElement['distance'] > 1:
                 self.lfbDistanceEdit.setText(str(round(self.targetElement['distance'], 0)))
                 self.lfbDistanceUnit.setText("m")
+            else:
+                self.lfbDistanceEdit.setText(str(round(self.targetElement['distance']*100, 0)))
+                self.lfbDistanceUnit.setText("cm")
         else:
-            self.lfbDistanceLayout_2.hide()
-            self.lfbDistanceEdit.setText("")
-            self.lfbDistanceUnit.setText("")
+            #self.lfbTargetDetailsWidget.hide()
+            self.lfbDistanceEdit.setText("-")
+            self.lfbDistanceUnit.setText("-")
 
         if 'bearing' in self.targetElement:
             degUnit = Utils.getSetting('degUnit', 'deg')

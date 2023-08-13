@@ -44,7 +44,6 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
             layer.selectionChanged.connect(self.layerSelectionChanged)
 
         self.layerSelectionChanged()
-        QgsMessageLog.logMessage('updateToC', 'LFB')
 
 
     def updateCoordinates(self, gpsInfo):
@@ -55,9 +54,13 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
 
         self.targets = self.createTargetList()
 
+        
+
+        
         position = QgsPointXY(QgsPoint(self.gpsInfo.longitude, self.gpsInfo.latitude))
         Utils.clearLayer('lfb-tmp-position', 'point')
         Utils.drawPosition('lfb-tmp-position', position)
+
 
         self.updateSelectionTargets()
 
@@ -72,6 +75,8 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
             for element in self.selectedFeatures:
                 geom = element['feature'].geometry()
                 startXY = QgsPointXY(geom.asPoint())
+                if startXY == endXY: 
+                    continue
                 
                 target = {
                     'id': element['feature'].id(),

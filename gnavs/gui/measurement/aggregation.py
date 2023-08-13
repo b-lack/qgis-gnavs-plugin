@@ -30,6 +30,8 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         QDialog.__init__(self, interface.mainWindow())
         self.setupUi(self)
 
+        self.settings = None
+
         #self.lfbAddToMapBtn.clicked.connect(self.emitData)
         self.lfbAddToMapBtn.setEnabled(False)
 
@@ -96,7 +98,10 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
     def aggregate(self, GPSInfos):
 
         #For Realtime Changes
-        self.refreshSettings()
+        #self.refreshSettings()
+
+        if self.settings == None:
+            self.refreshSettings()
         
         if self.settings['sortingValues']:
             for sortObj in reversed(self.settings['sortingValues']):

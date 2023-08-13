@@ -138,7 +138,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
     
     def onSerialPortChanged(self, index):
         self.geConnectionInfoLabel.setText("")
-        QgsMessageLog.logMessage("onSerialPortChanged", )
 
         newPort = self.lfbSerialPortList.itemData(index)
         if newPort is None or newPort == 'None':
@@ -231,7 +230,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         QgsSettings().setValue('gps/gpsd-serial-device', self.port)
 
-        QgsMessageLog.logMessage("connect", 'LFB')
 
         self.connectionTimer = QTimer()
         self.connectionTimer.setSingleShot(True)
@@ -240,7 +238,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         #self.connect()
 
     def connect(self):
-        QgsMessageLog.logMessage("connect", 'LFB')
 
         connection = self.connectionEstablished()
         
@@ -353,16 +350,32 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbSerialPortList.setEnabled(True)
 
+    def getQualityColor(self):
+        quaityIndicator =  self.lastGPSInfo.qualityIndicator
+        qualityDescription =  self.lastGPSInfo.constellationFixStatus()
+        pdop = self.lastGPSInfo.pdop
+        satellitesUsed = self.lastGPSInfo.satellitesUsed
+
+        QgsMessageLog.logMessage('getQualityColor: ' + str(quaityIndicator), 'LFB')
+        QgsMessageLog.logMessage('getQualityColor: ' + str(qualityDescription[0]), 'LFB')
+
+        if pdop <= 2 and satellitesUsed >= 10 and quaityIndicator == 'GpsQualityIndicator.RTK':
+            return 'green'
+        elif pdop > 2 and pdop <= 6 and satellitesUsed and quaityIndicator == 'GpsQualityIndicator.FloatRTK':
+            return 'yellow'
+        else:
+            return 'red'
+            
+
     def status_changed(self, gpsInfo):
 
         quality = gpsInfo.quality
         quaityIndicator = gpsInfo.qualityIndicator
-        QgsMessageLog.logMessage('GPSInfo: ' + str(quality) + ' ' + str(quaityIndicator), 'LFB')
+        
 
         try:
             if quality == 0:
                 self.lfbValidIndicator.setStyleSheet("background-color: red; border-radius: 5px;")
-                QgsMessageLog.logMessage('GPSInfo is not valid', 'LFB')
                 return
             elif quality == -1:
                 self.lfbValidIndicator.setStyleSheet("background-color: yellow; border-radius: 5px;")
@@ -370,6 +383,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
                 self.lfbValidIndicator.setStyleSheet("background-color: green; border-radius: 5px;")
 
             self.lastGPSInfo = gpsInfo
+            
 
             if self.keepFocus:
                 self.setFocus()
@@ -377,11 +391,14 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.emitAggregatedValues(gpsInfo)
         except Exception as e:
            self.geConnectionInfoLabel.setText(str(e))
+
+        #self.getQualityColor()
         
     def setMeasurementsCount(self):
         self.lfbGPSCount.setText(str(len(self.measures)))
 
     def emitAggregatedValues(self, GPSInfo):
+        
 
         self.measures.insert(0, {
             'utcDateTime': GPSInfo.utcDateTime.currentMSecsSinceEpoch(),
@@ -394,11 +411,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             'satellitesUsed': GPSInfo.satellitesUsed,
             'quality': GPSInfo.quality
         })
-
-
-            #self.measures.sort(key=lambda x: x.satellitesUsed, reverse=False)
-            #self.measures.sort(key=lambda x: x.pdop, reverse=True)
-            #self.measures.sort(key=lambda x: x.hdop, reverse=True)
 
         self.setMeasurementsCount()
 

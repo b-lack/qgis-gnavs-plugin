@@ -28,7 +28,7 @@
   <widget class="QWidget" name="dockWidgetContents">
    <property name="styleSheet">
     <string notr="true">QScrollArea#lfbScrollArea{
-	background-color: #ddd;
+
 }</string>
    </property>
    <layout class="QGridLayout" name="gridLayout">

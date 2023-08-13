@@ -31,7 +31,7 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
         self.interface = interface
         self.toggleState = 'navigation'
-
+        self.state = 'navigation'
 
         self.rec = self.addRecording()
         self.followBtn = self.addFocus()
@@ -49,6 +49,8 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
 
     def stateChanged(self, state):
+        self.state = state
+        QgsMessageLog.logMessage('---' + str(self.state), 'LFB')
         if state == 'point':
             self.measurement.hide()
 
@@ -63,12 +65,13 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
         self.rec.cancelConnection()
 
     def coordinatesChanged(self, gpsInfo):
-        if self.selection is not None:
+        if self.toggleState == 'navigation' and self.selection is not None:
             self.selection.updateCoordinates(gpsInfo)
 
     def aggregatedValuesChanged(self, gpsInfos):
-        self.measurement.updateAggregatedValues(gpsInfos)
-        pass
+        QgsMessageLog.logMessage('aggregatedValuesChanged: ' + str(self.state), 'LFB')
+        if self.toggleState == 'point':
+            self.measurement.updateAggregatedValues(gpsInfos)
 
     def toggleButtonsChanged(self, toggleButtons):
         self.toggleState = toggleButtons
@@ -84,11 +87,11 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
         self.rec.toggleButtonsChanged(self.toggleState)
 
-    def addToggleButtons(self):
-        toggleButtons = ToggleButtons(self.interface)
-        toggleButtons.change.connect(self.toggleButtonsChanged)
-        self.lfbSetup.insertWidget(0, toggleButtons)
-        return toggleButtons
+    #def addToggleButtons(self):
+    #    toggleButtons = ToggleButtons(self.interface)
+    #    toggleButtons.change.connect(self.toggleButtonsChanged)
+    #    self.lfbSetup.insertWidget(0, toggleButtons)
+    #    return toggleButtons
 
 
     def addRecording(self):

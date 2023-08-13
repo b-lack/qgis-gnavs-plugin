@@ -224,8 +224,10 @@ class Utils(object):
             return
         
         layer.startEditing()
-        layer.selectAll()
-        layer.deleteSelectedFeatures()
+        
+        listOfIds = [feat.id() for feat in layer.getFeatures()]
+        layer.deleteFeatures( listOfIds )
+
         layer.commitChanges()
         layer.endEditCommand()
 
