@@ -69,8 +69,8 @@ class Gnavs:
         self.actions = []
         self.menu = self.tr(u'&GNAVS - Navigate and Save')
         # TODO: We are going to let the user set this up in a future iteration
-        self.toolbar = self.iface.addToolBar(u'FindLocation')
-        self.toolbar.setObjectName(u'FindLocation')
+        self.toolbar = self.iface.addToolBar(u'GNAVS - Navigate and Save')
+        self.toolbar.setObjectName(u'GNAVS - Navigate and Save')
 
         #print "** INITIALIZING FindLocation"
 
@@ -91,7 +91,7 @@ class Gnavs:
         :rtype: QString
         """
         # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-        return QCoreApplication.translate('FindLocation', message)
+        return QCoreApplication.translate('GNAVS - Navigate and Save', message)
 
 
     def add_action(
@@ -171,7 +171,7 @@ class Gnavs:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/gnavs/assets/icon.png'
+        icon_path = ':/plugins/gnavs/assets/gnavs-icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'GNAVS - Navigate and Save'),

@@ -31,7 +31,7 @@ class FindLocationDialogTest(unittest.TestCase):
 
     def test_icon_png(self):
         """Test we can click OK."""
-        path = ':/plugins/FindLocation/icon.png'
+        path = ':/plugins/gnavs/assets/gnavs-icon.png'
         icon = QIcon(path)
         self.assertFalse(icon.isNull())
 

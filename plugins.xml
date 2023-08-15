@@ -6,7 +6,7 @@
         <qgis_minimum_version>3.26</qgis_minimum_version>
         <homepage>https://github.com/b-lack/qgis-gnavs-plugin</homepage>
         <file_name>gnavs.zip</file_name>
-        <icon>gnavs/assets/icon.png</icon>
+        <icon>gnavs/assets/gnavs-icon.png</icon>
         <author_name>Torsten Wiebke (Concept), Gerrit Balindt (Development)</author_name>
         <download_url>https://github.com/b-lack/qgis-gnavs-plugin/releases/download/v1.0.0/gnavs.zip</download_url>
         <uploaded_by>Grünecho</uploaded_by>
