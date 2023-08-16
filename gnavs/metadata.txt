@@ -10,7 +10,7 @@ version=0.1
 author=Torsten Wiebke (Concept), Gerrit Balindt (Development)
 email=support@gruenecho.de
 
-about=Find a selected location.
+about=Dieses QGIS-Plugin ermöglicht das Anzeigen deiner aktuellen Position (mithilfe eines internen oder externen GPS-Gerätes) auf der Karte. Bei ausgewählten Zielpunkten wird die Entfernung in Kilometer, Meter und Zentimeter sowie Winkel in wahlweise Grad, Gon oder Radiant angezeigt. Die Luftlinie zwischen deiner aktuellen Position und dem Zielpunkt wird auf der Karte visualisiert.Ist die Zielposition erreicht, können Punkte "eingemessen" werden. Hierfür werden solange DAten erhoben, bis die gewünsche Qualität erreicht wird. In den Einstellungen des Plugins können Anforderungen an die Genauigkeit der Positionsbestimmung festgelegt werden.\nBei erreichter Qualität können die Daten in einem GeoPackage gespeichert werden. Hierfür wird ein Layer angelegt. Die Daten können anschließend in QGIS oder anderen Anwendungen weiterverarbeitet werden.
 
 tracker=https://github.com/b-lack/search-gnavs-plugin/issues
 repository=https://github.com/b-lack/search-gnavs-plugin
