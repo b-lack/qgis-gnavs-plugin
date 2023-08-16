@@ -30,6 +30,16 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         self.connectionTimer = QTimer()
         self.connectionTimer.setSingleShot(True)
 
+
+        directory = Utils.getLayerDirectory('lfb-gnavs-aggregated')
+        #if directory is None:
+        #   directory = Utils.getSetting('directory', None)
+
+        self.lfbFileSelectionFileWidget.setFilePath(directory)
+        self.lfbFileSelectionFileWidget.fileChanged.connect(self.directoryEntered)
+
+
+
         # Degrees
         self.degUnits = [
             {"name": "Degree [°]", "value": "deg"},
@@ -98,15 +108,17 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
 
         # list widget items
         self.selectedItem = None
+
+
+        # "direction": True <- small to big
+        # "direction": False <- big to small
         self.defaultSorting = [
-            {"name": "Latitude", "value": "latitude", "direction": True},
-            {"name": "Longitude", "value": "longitude", "direction": True},
-            {"name": "PDOP", "value": "pdop", "direction": True},
-            {"name": "HDOP", "value": "hdop", "direction": True},
-            {"name": "Satellite Count", "value": "satellitesUsed", "direction": False},
-            #{"name": "Date Time", "value": "utcDateTime", "direction": False}, # False: Älteste zuerst
-            {"name": "Elevation", "value": "elevation", "direction": True},
-            {"name": "Quality", "value": "quality", "direction": True},
+            {"name": "Quality", "value": "qualityIndicator", "direction": True, "active": True},
+
+            {"name": "PDOP", "value": "pdop", "direction": True, "active": True},
+            {"name": "HDOP", "value": "hdop", "direction": True, "active": True},
+            
+            {"name": "Satellites Used", "value": "satellitesUsed", "direction": False, "active": True}
         ]
 
         self.items = json.loads(Utils.getSetting('sortingValues', json.dumps(self.defaultSorting)))
@@ -130,6 +142,21 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
 
         self.checkButtons()
 
+
+    def directoryEntered(self, directory):
+        Utils.setSetting('directory', directory)
+        
+        if directory is None or directory == '':
+            return
+        
+        if not directory.endswith('.gpkg'):
+            directory = directory + '.gpkg'
+            self.lfbFileSelectionFileWidget.setFilePath(directory)
+
+        QgsMessageLog.logMessage(str(directory), 'LFB')
+        
+        Utils.saveLayerAsFile('lfb-gnavs-aggregated')
+
     def aggregationChanged(self, item):
         saveValue = self.aggregationTpes[item]['value']
         Utils.setSetting('aggregationType', saveValue)
@@ -145,6 +172,7 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
     def bestMeassurementsChanged(self, item):
         saveValue = self.bestMeassurements[item]['value']
         Utils.setSetting('bestMeassurementSetting', saveValue)
+        QgsMessageLog.logMessage(str(saveValue), 'LFB')
 
     def checkButtons(self):
 
@@ -172,7 +200,6 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
     def saveSorting(self):
         Utils.setSetting('sortingValues', json.dumps(self.items))
         
-        
 
     def addItemsToList(self):
 
@@ -193,8 +220,6 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
 
         self.selectedItem = self.lfbGpsInfoSortingList.currentItem()
 
-        QgsMessageLog.logMessage(str( self.selectedItem.text() ),'LFB')
-
         
     def findItemPosition(self, item):
         for index, itemText in enumerate(self.items):
@@ -204,7 +229,6 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
 
     def sortUp(self):
 
-        QgsMessageLog.logMessage(str( 'UP0' ),'LFB')
         self.selectedItem = self.lfbGpsInfoSortingList.currentItem()
 
         if self.selectedItem == None:
@@ -217,8 +241,6 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         self.addItemsToList()
         self.lfbGpsInfoSortingList.setCurrentRow( newPosition )
         self.checkButtons()
-
-        QgsMessageLog.logMessage(str( 'UP1' ),'LFB')
     
     def sortDown(self):
 

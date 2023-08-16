@@ -58,6 +58,7 @@ class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         scroll.grabGesture(self.lfbScrollArea.viewport(), QScroller.LeftMouseButtonGesture)
 
         self.setupDevice = Setup(interface, 10)
+        self.setupDevice.measurementCountChanged.connect(self.lfbMeasurementCountChanged)
         self.geMainLayout.addWidget(self.setupDevice)
 
         self.Settings = Settings(interface, 10)
@@ -75,10 +76,21 @@ class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         
 
-        self.lfbAddToMapBtn.clicked.connect(self.setupDevice.addDataToMap)
+        self.lfbAddToMapBtn.clicked.connect(self.addToMap)
 
         self.toHome()
         self.toggleButtonsChanged('navigation')
+
+    def addToMap(self):
+        self.setupDevice.addDataToMap()
+        self.lfbAddToMapBtn.setEnabled(False)
+
+    def lfbMeasurementCountChanged(self, count):
+        QgsMessageLog.logMessage('GnavsDockWidget: lfbMeasurementCountChanged: ' + str(count), 'LFB')
+        if count > 0:
+            self.lfbAddToMapBtn.setEnabled(True)
+        else:
+            self.lfbAddToMapBtn.setEnabled(False)
 
     def toggleButtonsChanged(self, state):
         if state == 'settings':

@@ -22,6 +22,8 @@ UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'setup.ui')
 
 class Setup(QtWidgets.QWidget, UI_CLASS):
 
+    measurementCountChanged = QtCore.pyqtSignal(int)
+    qualityChanged = QtCore.pyqtSignal(int)
 
     def __init__(self, interface, bestCount=5):
         """Constructor."""
@@ -50,7 +52,6 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
     def stateChanged(self, state):
         self.state = state
-        QgsMessageLog.logMessage('---' + str(self.state), 'LFB')
         if state == 'point':
             self.measurement.hide()
 
@@ -69,9 +70,12 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
             self.selection.updateCoordinates(gpsInfo)
 
     def aggregatedValuesChanged(self, gpsInfos):
-        QgsMessageLog.logMessage('aggregatedValuesChanged: ' + str(self.state), 'LFB')
-        if self.toggleState == 'point':
+        self.measurementCountChanged.emit(len(gpsInfos))
+
+        if self.toggleState == 'point' and len(gpsInfos) > 0:
             self.measurement.updateAggregatedValues(gpsInfos)
+
+        
 
     def toggleButtonsChanged(self, toggleButtons):
         self.toggleState = toggleButtons
@@ -122,6 +126,7 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
     def addDataToMap(self):
         self.stopTracking()
         self.measurement.emitData()
+
 
     #def addDataToMap(self, aggregatedValues, gpsInfos):
     #    self.stopTracking()

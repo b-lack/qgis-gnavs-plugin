@@ -3,6 +3,7 @@ import os
 import json
 import statistics
 import time
+import random
 
 
 from qgis.PyQt import QtWidgets, uic
@@ -351,13 +352,17 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.lfbSerialPortList.setEnabled(True)
 
     def getQualityColor(self):
+        if self.lastGPSInfo is None:
+            return
+        
         quaityIndicator =  self.lastGPSInfo.qualityIndicator
-        qualityDescription =  self.lastGPSInfo.constellationFixStatus()
+        #qualityDescription =  self.lastGPSInfo.constellationFixStatus()
         pdop = self.lastGPSInfo.pdop
         satellitesUsed = self.lastGPSInfo.satellitesUsed
 
         QgsMessageLog.logMessage('getQualityColor: ' + str(quaityIndicator), 'LFB')
-        QgsMessageLog.logMessage('getQualityColor: ' + str(qualityDescription[0]), 'LFB')
+        QgsMessageLog.logMessage(str( str(quaityIndicator) == 'GpsQualityIndicator.GPS' ), 'LFB')
+        #QgsMessageLog.logMessage('getQualityColor: ' + str(qualityDescription), 'LFB')
 
         if pdop <= 2 and satellitesUsed >= 10 and quaityIndicator == 'GpsQualityIndicator.RTK':
             return 'green'
@@ -370,8 +375,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
     def status_changed(self, gpsInfo):
 
         quality = gpsInfo.quality
-        quaityIndicator = gpsInfo.qualityIndicator
         
+        #self.getQualityColor()
 
         try:
             if quality == 0:
@@ -397,9 +402,21 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
     def setMeasurementsCount(self):
         self.lfbGPSCount.setText(str(len(self.measures)))
 
+    def getQualityColor(self, gpsInfo):
+
+        quaityIndicator = gpsInfo.qualityIndicator
+
+        if str(quaityIndicator) == 'GpsQualityIndicator.RTK':
+            return 1
+        elif str(quaityIndicator) == 'GpsQualityIndicator.FloatRTK':
+            return 2
+        elif str(quaityIndicator) == 'GpsQualityIndicator.GPS':
+            return 3
+        else:
+            return 10
+
     def emitAggregatedValues(self, GPSInfo):
         
-
         self.measures.insert(0, {
             'utcDateTime': GPSInfo.utcDateTime.currentMSecsSinceEpoch(),
             'latitude': GPSInfo.latitude,
@@ -409,7 +426,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             'pdop': GPSInfo.pdop,
             'hdop': GPSInfo.hdop,
             'satellitesUsed': GPSInfo.satellitesUsed,
-            'quality': GPSInfo.quality
+            'quality': GPSInfo.quality,
+            'qualityIndicator': random.randint(0,10) #self.getQualityColor(GPSInfo),
         })
 
         self.setMeasurementsCount()

@@ -1,9 +1,11 @@
 import json
+import os
+import re
 
 from qgis import qgis
-from qgis.core import QgsSettings, QgsLayerTreeLayer, QgsPoint, QgsPointXY, QgsProject, QgsMessageLog, QgsGpsDetector, QgsDistanceArea, QgsCoordinateTransform, QgsExpressionContextUtils, QgsFeature, QgsMapLayer, QgsFields, QgsStyle, QgsGeometry, QgsField, QgsVectorLayer, QgsCoordinateReferenceSystem
+from qgis.core import QgsSettings, QgsLayerTreeLayer, QgsPoint, QgsVectorFileWriter, QgsCoordinateTransformContext, QgsPointXY, QgsProject, QgsMessageLog, QgsGpsDetector, QgsDistanceArea, QgsCoordinateTransform, QgsExpressionContextUtils, QgsFeature, QgsMapLayer, QgsFields, QgsStyle, QgsGeometry, QgsField, QgsVectorLayer, QgsCoordinateReferenceSystem
 from qgis.utils import iface
-from qgis.PyQt.QtCore import QVariant, QDateTime
+from qgis.PyQt.QtCore import QVariant, QDateTime, QFileInfo
 from PyQt5.QtGui import QColor
 
 PLUGIN_NAME = "find_location"
@@ -12,7 +14,7 @@ class Utils(object):
 
     point_fields = [
         
-
+        ("fid", QVariant.Int),
         ("name", QVariant.String),
         ("device", QVariant.String),
         ("description", QVariant.String),
@@ -39,10 +41,9 @@ class Utils(object):
         ("pdop", QVariant.Double),
         ("pdopStDev", QVariant.Double),
 
-        ("quality", QVariant.Int),
-
         ("satellitesUsed", QVariant.Double),
         
+        ("sorting", QVariant.String),
         ("raw", QVariant.String),
     ]
 
@@ -194,6 +195,9 @@ class Utils(object):
         names = [layer for layer in QgsProject.instance().mapLayers().values()]
 
         for i in names:
+            layer = Utils.getLayerById(layerName)
+            if layer is not None:
+                return layer
             if QgsExpressionContextUtils.layerScope(i).variable('LFB-NAME') == layerName :
                 #Utils.setStyle(i)
                 return i
@@ -201,8 +205,8 @@ class Utils(object):
         vl = QgsVectorLayer(type, layerName, "memory")
         QgsExpressionContextUtils.setLayerVariable(vl, 'LFB-NAME', layerName)
 
-        if private:
-            vl.setFlags(QgsMapLayer.Private)
+        #if private:
+        #    vl.setFlags(QgsMapLayer.Private)
         
         if fields is not None:
             fields = Utils.getGPSInfoFields()
@@ -217,6 +221,47 @@ class Utils(object):
 
         return vl
     
+    def getLayerDirectory(layerName):
+        layer = Utils.getLayerById(layerName)
+
+        if layer is None:
+            return None
+        path = layer.dataProvider().dataSourceUri().split("|")[0]
+        if path.startswith('memory'):
+            return None
+        if path.endswith('.gpkg'):
+            return path
+        else:
+            return path + '.gpkg'
+    
+    def saveLayerAsFile(layerName):
+        pathToBeSet = Utils.getSetting('directory')
+        layer = Utils.getLayerById(layerName)
+
+        if layer is None or pathToBeSet is None:
+            return None
+        
+        writer = QgsVectorFileWriter.writeAsVectorFormatV3(layer, pathToBeSet, QgsCoordinateTransformContext(), QgsVectorFileWriter.SaveVectorOptions())
+        if writer[0] == QgsVectorFileWriter.NoError:
+            layer.setDataSource(pathToBeSet, layer.name(), 'ogr')
+            layer.triggerRepaint() 
+        else:
+            print("error")
+
+    def saveDraftPath(directory, layerName):
+        layers = QgsProject.instance().mapLayers().values()
+
+        for layer in layers:
+            if QgsExpressionContextUtils.layerScope(layer).variable('LFB-NAME') == layerName :
+                pathToBeSet = os.path.join(directory, layerName + '.gpkg')
+                writer = QgsVectorFileWriter.writeAsVectorFormatV3(layer, pathToBeSet, QgsCoordinateTransformContext(), QgsVectorFileWriter.SaveVectorOptions())
+
+                if writer[0] == QgsVectorFileWriter.NoError:
+                    layer.setDataSource(pathToBeSet, layer.name(), 'ogr')
+                    layer.triggerRepaint() 
+                else:
+                    print("error")
+
     def clearLayer(layerName, type='point'):
         layer = Utils.getPrivateLayers(layerName, type)
 
@@ -343,18 +388,36 @@ class Utils(object):
                     feature.setAttribute(field[0], gpsInfos[field[0]])
         
         return feature
+    
+    
+    def getLayerById(layerName):
+        layers = QgsProject.instance().mapLayers().values()
+
+        layerId1 = re.sub('[^a-zA-Z0-9 \n\.]', '', layerName)
+        layerId2 = layerName.replace('-', '_')
+
+        for layer in layers:
+            if layer.id().startswith(layerId1) or layer.id().startswith(layerId2) :
+                return layer
+        
+        return None
 
     def addPointToLayer(layerName, aggregatedValues, gpsInfos):
 
+        layer = Utils.getLayerById(layerName)
 
         fields = Utils.getGPSInfoFields()
-        layer = Utils.getPrivateLayers(layerName, 'point', False, False, fields)
+
+        if layer is None:
+            layer = Utils.getPrivateLayers(layerName, 'point', False, False, fields)
 
         if layer is None:
             return
 
         feature = Utils.createFeatureFromGpsInfos(aggregatedValues, fields)
 
+        sorting = Utils.getSetting('sortingValues')
+        feature.setAttribute('sorting', sorting)
         feature.setAttribute('raw', json.dumps(gpsInfos))
 
         layer.startEditing()

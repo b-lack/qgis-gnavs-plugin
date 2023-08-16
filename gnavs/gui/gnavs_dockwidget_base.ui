@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1033</width>
-    <height>614</height>
+    <width>656</width>
+    <height>612</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -58,24 +58,24 @@
       <item>
        <widget class="QWidget" name="lfbMenuBar" native="true">
         <property name="styleSheet">
-         <string notr="true">background-color:#eee;
-border-bottom: 1px solid #888;</string>
+         <string notr="true">background-color:#333;
+border-bottom: 0px solid #888;</string>
         </property>
         <layout class="QHBoxLayout" name="lfbMenuBarLayout">
          <property name="spacing">
           <number>5</number>
          </property>
          <property name="leftMargin">
-          <number>5</number>
+          <number>10</number>
          </property>
          <property name="topMargin">
-          <number>5</number>
+          <number>10</number>
          </property>
          <property name="rightMargin">
-          <number>5</number>
+          <number>10</number>
          </property>
          <property name="bottomMargin">
-          <number>5</number>
+          <number>10</number>
          </property>
         </layout>
        </widget>
@@ -97,8 +97,8 @@ border-bottom: 1px solid #888;</string>
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1031</width>
-           <height>526</height>
+           <width>654</width>
+           <height>514</height>
           </rect>
          </property>
          <layout class="QVBoxLayout">
@@ -137,8 +137,7 @@ border-bottom: 1px solid #888;</string>
       <item>
        <widget class="QWidget" name="lfbAddToMapWidget" native="true">
         <property name="styleSheet">
-         <string notr="true">background-color:#eee;
-border-top: 1px solid #888;</string>
+         <string notr="true">background-color:#444;</string>
         </property>
         <layout class="QHBoxLayout" name="lfbAddToMap">
          <property name="leftMargin">
@@ -155,10 +154,22 @@ border-top: 1px solid #888;</string>
          </property>
          <item>
           <widget class="QPushButton" name="lfbAddToMapBtn">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="styleSheet">
             <string notr="true">QPushButton{
-	border: 2px solid #333;
-	color: #555;
+	border: 2px solid #888;
+	color: #888;
 	padding: 5px;
 	margin: 5px;
 }

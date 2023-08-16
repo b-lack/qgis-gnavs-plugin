@@ -25,24 +25,32 @@ class ToggleButtons(QtWidgets.QWidget, UI_CLASS):
         self.lfbNavigationButton.clicked.connect(self.navigationButtonClicked)
         self.lfbSettingsButton.clicked.connect(self.settingsButtonClicked)
 
+        
+
+        self.unactiveStyle = "background-color: rgb(255, 255, 255);border: 1px solid green;padding: 5px;"
+        self.activeStyle = "background-color: green;border: 1px solid green;padding: 5px;color: #fff;"
+
         self.updateButtons(isNavigation)
 
     def updateButtons(self, selected):
         if selected == 'navigation':
             self.lfbNavigationButton.setChecked(True)
             self.lfbPointButton.setChecked(False)
-            self.lfbPointButton.setStyleSheet("background-color: rgb(255, 255, 255);padding: 5px;")
-            self.lfbNavigationButton.setStyleSheet("background-color: green;padding: 5px;")
+            self.lfbPointButton.setStyleSheet(self.unactiveStyle)
+            self.lfbNavigationButton.setStyleSheet(self.activeStyle)
+            self.lfbSettingsButton.setStyleSheet(self.unactiveStyle)
         elif selected == 'point':
             self.lfbNavigationButton.setChecked(False)
             self.lfbPointButton.setChecked(True)
-            self.lfbNavigationButton.setStyleSheet("background-color: rgb(255, 255, 255);padding: 5px;")
-            self.lfbPointButton.setStyleSheet("background-color: green;padding: 5px;")
+            self.lfbNavigationButton.setStyleSheet(self.unactiveStyle)
+            self.lfbPointButton.setStyleSheet(self.activeStyle)
+            self.lfbSettingsButton.setStyleSheet(self.unactiveStyle)
         else :
             self.lfbNavigationButton.setChecked(False)
             self.lfbPointButton.setChecked(False)
-            self.lfbNavigationButton.setStyleSheet("background-color: rgb(255, 255, 255);padding: 5px;")
-            self.lfbPointButton.setStyleSheet("background-color: rgb(255, 255, 255);padding: 5px;")
+            self.lfbNavigationButton.setStyleSheet(self.unactiveStyle)
+            self.lfbPointButton.setStyleSheet(self.unactiveStyle)
+            self.lfbSettingsButton.setStyleSheet(self.activeStyle)
 
     def settingsButtonClicked(self):
         self.updateButtons('settings')

@@ -43,6 +43,11 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
 
         Utils.addPointToLayer('lfb-gnavs-aggregated', self.aggregatedValues, self.gpsInfos)
 
+        directory = Utils.getSetting('directory', None)
+        QgsMessageLog.logMessage(directory, 'LFB')
+        #if directory is not None:
+            #Utils.saveDraftPath(directory, 'lfb-gnavs-aggregated')
+
         #self.addToMap.emit(self.aggregatedValues, self.gpsInfos)
         self.reset()
 
@@ -105,11 +110,13 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         
         if self.settings['sortingValues']:
             for sortObj in reversed(self.settings['sortingValues']):
-               GPSInfos.sort(key=lambda x: x[sortObj['value']], reverse=sortObj['direction'])
+                if 'active' in sortObj and sortObj['active']:
+                    GPSInfos.sort(key=lambda x: x[sortObj['value']], reverse=sortObj['direction'])
 
 
         measurementLength = len(GPSInfos)
         besteMeasurements = round(measurementLength * int(self.settings['bestMeassurementSetting']) / 100)
+        QgsMessageLog.logMessage(str(self.settings['bestMeassurementSetting']), 'LFB')
 
         listBestMeasurements = GPSInfos[:besteMeasurements]
         aggregationType = self.settings['aggregationType']
@@ -157,6 +164,9 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         }
     
     def getTextFields(self):
+        if self.aggregatedValues == None:
+            return
+        
         self.aggregatedValues['device'] = self.lfbGPSDevice.text()
         self.aggregatedValues['name'] = self.lfbGPSName.text()
         self.aggregatedValues['description'] = self.lfbGPSDescription.toPlainText()
