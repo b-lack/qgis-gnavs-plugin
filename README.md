@@ -8,7 +8,7 @@ Bei ausgewählten Zielpunkten wird die Entfernung in Kilometer, Meter und Zentim
 
 Ist die Zielposition erreicht, können Punkte "eingemessen" werden. Hierfür werden solange DAten erhoben, bis die gewünsche Qualität erreicht wird. In den Einstellungen des Plugins können Anforderungen an die Genauigkeit der Positionsbestimmung festgelegt werden.
 
-BEi erreichter Qualität können die Daten in einem GeoPackage gespeichert werden. Hierfür wird ein Layer angelegt. Die Daten können anschließend in QGIS oder anderen Anwendungen weiterverarbeitet werden.
+Bei erreichter Qualität können die Daten in einem GeoPackage gespeichert werden. Hierfür wird ein Layer angelegt. Die Daten können anschließend in QGIS oder anderen Anwendungen weiterverarbeitet werden.
 
 ## Installation from Repository
 
