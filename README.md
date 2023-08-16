@@ -1,4 +1,4 @@
-# search-gnavs-plugin
+# GNAVS - GNSS Navigate and Save
 
 ## Description
 
