@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/gerrit/Sites/lfb/search-gnavs-plugin/find_location/gui/find_location_dockwidget_base.ui'
+# Form implementation generated from reading ui file '/home/gerrit/Sites/lfb/qgis-gnavs-plugin/gnavs/gui/gnavs_dockwidget_base.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.6
 #
@@ -11,35 +11,90 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_FindLocationDockWidgetBase(object):
-    def setupUi(self, FindLocationDockWidgetBase):
-        FindLocationDockWidgetBase.setObjectName("FindLocationDockWidgetBase")
-        FindLocationDockWidgetBase.resize(979, 613)
+class Ui_GnavsDockWidgetBase(object):
+    def setupUi(self, GnavsDockWidgetBase):
+        GnavsDockWidgetBase.setObjectName("GnavsDockWidgetBase")
+        GnavsDockWidgetBase.resize(656, 612)
+        GnavsDockWidgetBase.setMinimumSize(QtCore.QSize(150, 223))
+        GnavsDockWidgetBase.setStyleSheet("")
+        GnavsDockWidgetBase.setWindowFilePath("")
         self.dockWidgetContents = QtWidgets.QWidget()
+        self.dockWidgetContents.setStyleSheet("QScrollArea#lfbScrollArea{\n"
+"\n"
+"}")
         self.dockWidgetContents.setObjectName("dockWidgetContents")
         self.gridLayout = QtWidgets.QGridLayout(self.dockWidgetContents)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
-        self.scrollArea = QtWidgets.QScrollArea(self.dockWidgetContents)
-        self.scrollArea.setWidgetResizable(True)
-        self.scrollArea.setObjectName("scrollArea")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setContentsMargins(-1, 0, -1, 0)
+        self.verticalLayout.setSpacing(0)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.lfbMenuBar = QtWidgets.QWidget(self.dockWidgetContents)
+        self.lfbMenuBar.setStyleSheet("background-color:#333;\n"
+"border-bottom: 0px solid #888;")
+        self.lfbMenuBar.setObjectName("lfbMenuBar")
+        self.lfbMenuBarLayout = QtWidgets.QHBoxLayout(self.lfbMenuBar)
+        self.lfbMenuBarLayout.setContentsMargins(10, 10, 10, 10)
+        self.lfbMenuBarLayout.setSpacing(5)
+        self.lfbMenuBarLayout.setObjectName("lfbMenuBarLayout")
+        self.verticalLayout.addWidget(self.lfbMenuBar)
+        self.lfbScrollArea = QtWidgets.QScrollArea(self.dockWidgetContents)
+        self.lfbScrollArea.setTabletTracking(True)
+        self.lfbScrollArea.setStyleSheet("border: none;\n"
+"")
+        self.lfbScrollArea.setWidgetResizable(True)
+        self.lfbScrollArea.setObjectName("lfbScrollArea")
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 977, 592))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 654, 514))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.vboxlayout = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
+        self.vboxlayout.setContentsMargins(0, 0, 0, 0)
         self.vboxlayout.setObjectName("vboxlayout")
         self.geMainLayout = QtWidgets.QVBoxLayout()
         self.geMainLayout.setObjectName("geMainLayout")
         self.vboxlayout.addLayout(self.geMainLayout)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.vboxlayout.addItem(spacerItem)
-        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-        self.gridLayout.addWidget(self.scrollArea, 0, 0, 1, 1)
-        FindLocationDockWidgetBase.setWidget(self.dockWidgetContents)
+        self.lfbScrollArea.setWidget(self.scrollAreaWidgetContents)
+        self.verticalLayout.addWidget(self.lfbScrollArea)
+        self.lfbAddToMapWidget = QtWidgets.QWidget(self.dockWidgetContents)
+        self.lfbAddToMapWidget.setStyleSheet("background-color:#444;")
+        self.lfbAddToMapWidget.setObjectName("lfbAddToMapWidget")
+        self.lfbAddToMap = QtWidgets.QHBoxLayout(self.lfbAddToMapWidget)
+        self.lfbAddToMap.setContentsMargins(5, 5, 5, 5)
+        self.lfbAddToMap.setObjectName("lfbAddToMap")
+        self.lfbAddToMapBtn = QtWidgets.QPushButton(self.lfbAddToMapWidget)
+        self.lfbAddToMapBtn.setEnabled(False)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.lfbAddToMapBtn.setFont(font)
+        self.lfbAddToMapBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.lfbAddToMapBtn.setStyleSheet("QPushButton{\n"
+"    border: 2px solid #888;\n"
+"    color: #888;\n"
+"    padding: 5px;\n"
+"    margin: 5px;\n"
+"}\n"
+"QPushButton:hover{\n"
+"    background-color: yellow;\n"
+"}\n"
+"QPushButton:enabled{\n"
+"    border:  2px solid green;\n"
+"    background-color: green;\n"
+"    color: #fff;\n"
+"}")
+        self.lfbAddToMapBtn.setObjectName("lfbAddToMapBtn")
+        self.lfbAddToMap.addWidget(self.lfbAddToMapBtn)
+        self.verticalLayout.addWidget(self.lfbAddToMapWidget)
+        self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
+        GnavsDockWidgetBase.setWidget(self.dockWidgetContents)
 
-        self.retranslateUi(FindLocationDockWidgetBase)
-        QtCore.QMetaObject.connectSlotsByName(FindLocationDockWidgetBase)
+        self.retranslateUi(GnavsDockWidgetBase)
+        QtCore.QMetaObject.connectSlotsByName(GnavsDockWidgetBase)
 
-    def retranslateUi(self, FindLocationDockWidgetBase):
+    def retranslateUi(self, GnavsDockWidgetBase):
         _translate = QtCore.QCoreApplication.translate
-        FindLocationDockWidgetBase.setWindowTitle(_translate("FindLocationDockWidgetBase", "GNAVS - GNSS Navigate and Save"))
+        GnavsDockWidgetBase.setWindowTitle(_translate("GnavsDockWidgetBase", "GNAVS - GNSS Navigate and Save"))
+        self.lfbAddToMapBtn.setText(_translate("GnavsDockWidgetBase", "ADD TO MAP"))
