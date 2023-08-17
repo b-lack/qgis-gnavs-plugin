@@ -1,6 +1,6 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <plugins>
-    <pyqgis_plugin name="GNAVS" version="0.0.1">
+    <pyqgis_plugin name="GNAVS" version="1.0.2">
         <description><![CDATA[GNAVS - GNSS Navigate and Save]]></description>
         <version>1.0.2</version>
         <qgis_minimum_version>3.22</qgis_minimum_version>

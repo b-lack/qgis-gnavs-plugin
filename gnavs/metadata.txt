@@ -6,7 +6,7 @@
 name=GNAVS
 qgisMinimumVersion=3.0
 description=GNSS Navigate and Save
-version=0.1
+version=1.0.2
 author=Torsten Wiebke (Concept), Gerrit Balindt (Development)
 email=support@gruenecho.de
 
