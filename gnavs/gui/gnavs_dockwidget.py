@@ -86,7 +86,6 @@ class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.lfbAddToMapBtn.setEnabled(False)
 
     def lfbMeasurementCountChanged(self, count):
-        QgsMessageLog.logMessage('GnavsDockWidget: lfbMeasurementCountChanged: ' + str(count), 'LFB')
         if count > 0:
             self.lfbAddToMapBtn.setEnabled(True)
         else:

@@ -356,13 +356,9 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             return
         
         quaityIndicator =  self.lastGPSInfo.qualityIndicator
-        #qualityDescription =  self.lastGPSInfo.constellationFixStatus()
         pdop = self.lastGPSInfo.pdop
         satellitesUsed = self.lastGPSInfo.satellitesUsed
 
-        QgsMessageLog.logMessage('getQualityColor: ' + str(quaityIndicator), 'LFB')
-        QgsMessageLog.logMessage(str( str(quaityIndicator) == 'GpsQualityIndicator.GPS' ), 'LFB')
-        #QgsMessageLog.logMessage('getQualityColor: ' + str(qualityDescription), 'LFB')
 
         if pdop <= 2 and satellitesUsed >= 10 and quaityIndicator == 'GpsQualityIndicator.RTK':
             return 'green'
@@ -376,8 +372,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         quality = gpsInfo.quality
         
-        #self.getQualityColor()
-
         try:
             if quality == 0:
                 self.lfbValidIndicator.setStyleSheet("background-color: red; border-radius: 5px;")
@@ -397,7 +391,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         except Exception as e:
            self.geConnectionInfoLabel.setText(str(e))
 
-        #self.getQualityColor()
         
     def setMeasurementsCount(self):
         self.lfbGPSCount.setText(str(len(self.measures)))

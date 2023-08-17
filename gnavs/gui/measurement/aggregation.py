@@ -44,7 +44,7 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         Utils.addPointToLayer('lfb-gnavs-aggregated', self.aggregatedValues, self.gpsInfos)
 
         directory = Utils.getSetting('directory', None)
-        QgsMessageLog.logMessage(directory, 'LFB')
+
         #if directory is not None:
             #Utils.saveDraftPath(directory, 'lfb-gnavs-aggregated')
 

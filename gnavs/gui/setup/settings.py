@@ -152,8 +152,6 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         if not directory.endswith('.gpkg'):
             directory = directory + '.gpkg'
             self.lfbFileSelectionFileWidget.setFilePath(directory)
-
-        QgsMessageLog.logMessage(str(directory), 'LFB')
         
         Utils.saveLayerAsFile('lfb-gnavs-aggregated')
 
@@ -172,7 +170,6 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
     def bestMeassurementsChanged(self, item):
         saveValue = self.bestMeassurements[item]['value']
         Utils.setSetting('bestMeassurementSetting', saveValue)
-        QgsMessageLog.logMessage(str(saveValue), 'LFB')
 
     def checkButtons(self):
 

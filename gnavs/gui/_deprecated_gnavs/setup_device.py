@@ -111,7 +111,6 @@ class SetupDevices(QtWidgets.QWidget, UI_CLASS):
 
     def cancelConnection(self):
 
-        QgsMessageLog.logMessage(str(self.gpsCon), 'LFB')
         try:
             if self.gpsCon is not None:
                 self.gpsCon.stateChanged.disconnect(self.status_changed)
@@ -173,9 +172,7 @@ class SetupDevices(QtWidgets.QWidget, UI_CLASS):
         QgsMessageLog.logMessage(str(gpsInfo))
 
     def status_changed(self, gpsInfo):
-        
-        QgsMessageLog.logMessage(str('fff'), 'LFB')
-        
+                
 
         try:
             self.lfbGPSState.setText('Daten wurden erfolgreich ermittelt.')
