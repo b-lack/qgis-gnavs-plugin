@@ -25,6 +25,8 @@ from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
+from qgis.core import QgsMessageLog
+
 # Initialize Qt resources from file resources.py
 #from .resources import *
 
@@ -35,9 +37,6 @@ import os.path
 
 class Gnavs:
     """QGIS Plugin Implementation."""
-
-    def test(self, attr):
-        return str(100) + attr
 
     def __init__(self, iface):
         """Constructor.
@@ -54,16 +53,18 @@ class Gnavs:
         self.plugin_dir = os.path.dirname(__file__)
 
         # initialize locale
-        #locale = QSettings().value('locale/userLocale')[0:2]
-        #locale_path = os.path.join(
-        #    self.plugin_dir,
-        #    'i18n',
-        #    'FindLocation_{}.qm'.format(locale))
+        locale = QSettings().value('locale/userLocale')[0:2]
+        locale_path = os.path.join(
+            self.plugin_dir,
+            'i18n',
+            'gnavs_{}.qm'.format(locale))
+        
+        QgsMessageLog.logMessage("locale_path: " + locale_path, "GNAVS")
 
-        #if os.path.exists(locale_path):
-        #    self.translator = QTranslator()
-        #    self.translator.load(locale_path)
-        #    QCoreApplication.installTranslator(self.translator)
+        if os.path.exists(locale_path):
+            self.translator = QTranslator()
+            self.translator.load(locale_path)
+            QCoreApplication.installTranslator(self.translator)
 
         # Declare instance attributes
         self.actions = []
