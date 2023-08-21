@@ -116,7 +116,6 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
 
         measurementLength = len(GPSInfos)
         besteMeasurements = round(measurementLength * int(self.settings['bestMeassurementSetting']) / 100)
-        QgsMessageLog.logMessage(str(self.settings['bestMeassurementSetting']), 'LFB')
 
         listBestMeasurements = GPSInfos[:besteMeasurements]
         aggregationType = self.settings['aggregationType']

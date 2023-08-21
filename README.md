@@ -1,5 +1,5 @@
 <h1>
-  <img src="./gnavs/assets/gnavs-icon.png"/>
+  <img src="./gnavs/assets/gnavs-icon.png" alt="Logo Plugin"/>
   GNAVS - GNSS Navigate and Save
 </h1>
 
@@ -13,25 +13,51 @@ Ist die Zielposition erreicht, können Punkte "eingemessen" werden. Hierfür wer
 
 Bei erreichter Qualität können die Daten in einem GeoPackage gespeichert werden. Hierfür wird ein Layer angelegt. Die Daten können anschließend in QGIS oder anderen Anwendungen weiterverarbeitet werden.
 
+## Features
+
+### Navigation
+- Selection of the external/internal GPS device
+- Display of the current position
+- Display of the distance to the target point
+- Display of the angle to the target point
+
+### Point recording
+- Recording of the current position
+- Save the recorded points in a GeoPackage layer with relevant GNSS attributes
+
 ## Installation from Repository
 
-QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``Settings``
+1. QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``Settings``
 
-In the **Plugin Repositories** section click `+Add`.
+2. In the **Plugin Repositories** section click `+Add`.
 
-- Name: `GNAVS`
-- URL: `https://raw.githubusercontent.com/b-lack/qgis-gnavs-plugin/main/plugins.xml`
+  - Name: `GNAVS`
+  - URL: `https://raw.githubusercontent.com/b-lack/qgis-gnavs-plugin/main/plugins.xml`
 
-Check: "Allow experimental plugins"
+3. Check: "Allow experimental plugins"
 
-Confirm by clicking `OK`
+4. QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``ALL``
 
-Restart QGIS
+5. Search for `GNAVS` and select `GNAVS - GNSS Navigate and Save`
 
-QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``ALL``
-
-Search for `GNAVS` and select `GNAVS - GNSS Navigate and Save`
-
-Confirm by clicking `Install Plugin`
+6. Confirm by clicking `Install Plugin`
 
 Done: The plugin is now installed and can be used.
+
+# Reporting Issues
+
+Please report any issue regarding the GNAVS plugin [here](https://github.com/b-lack/qgis-gnavs-plugin/issues).
+
+# License
+
+This plugin is licensed under the [GNU GENERAL PUBLIC LICENSE](./LICENSE).
+
+# About
+
+Commissioned through the [Brandenburg State Forestry Office](https://forst.brandenburg.de/).
+
+- Concept by: [Torsten Wiebke](https://www.gruenecho.de/)
+- Develpment by: [Gerrit Balindt](https://gruenecho.de/)
+
+
+💚 Free to use by everyone 💚
