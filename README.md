@@ -1,4 +1,7 @@
-# GNAVS - GNSS Navigate and Save
+<h1>
+  <img src="./gnavs/assets/gnavs-icon.png"/>
+  GNAVS - GNSS Navigate and Save
+</h1>
 
 ## Description
 
@@ -16,7 +19,7 @@ QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``Settings``
 
 In the **Plugin Repositories** section click `+Add`.
 
-- Name: `Find and Search Plugin`
+- Name: `GNAVS`
 - URL: `https://raw.githubusercontent.com/b-lack/qgis-gnavs-plugin/main/plugins.xml`
 
 Check: "Allow experimental plugins"
@@ -27,7 +30,7 @@ Restart QGIS
 
 QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``ALL``
 
-Search for `LFB` and select `LFB Verjüngungszustands- und Wildeinfluss Monitoring`
+Search for `GNAVS` and select `GNAVS - GNSS Navigate and Save`
 
 Confirm by clicking `Install Plugin`
 
