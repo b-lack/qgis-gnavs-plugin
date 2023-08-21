@@ -43,6 +43,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.lastGPSInfo = None
         self.keepFocus = False
 
+        self._translate = QtCore.QCoreApplication.translate
+
         if aggregate:
             self.recordingStyle = 'point'
             self.lfbGetCoordinatesGtn.setText("START")
@@ -191,7 +193,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
     def connectionTestFailed(self):
         
-        self.geConnectionInfoLabel.setText("Verbindung fehlgeschlagen.")
+        self.geConnectionInfoLabel.setText(self._translate("Form", "Verbindung fehlgeschlagen."))
         self.geConnectionInfoLabel.setStyleSheet("color: red;")
         self.lfbSerialPortList.setEnabled(True)
         self.lfbGetCoordinatesGtn.setEnabled(False)
@@ -203,7 +205,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             pass
 
     def connectionTestSucceed(self, connection):
-        self.geConnectionInfoLabel.setText("Verbindung erfolgreich.")
+        self.geConnectionInfoLabel.setText(self._translate("Form", "Verbindung erfolgreich."))
         self.geConnectionInfoLabel.setStyleSheet("color: green;")
         self.lfbSerialPortList.setEnabled(True)
         self.lfbGetCoordinatesGtn.setEnabled(True)
@@ -218,7 +220,9 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
 
     def delayConnection(self, connection):
-        self.geConnectionInfoLabel.setText("Port wird gestestet...")
+        
+
+        self.geConnectionInfoLabel.setText(self._translate("Form", "Port wird gestestet..."))
         self.geConnectionInfoLabel.setStyleSheet("color: gray;")
 
         
@@ -248,7 +252,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             return
 
         if self.port is None:
-            self.geConnectionInfoLabel.setText('Wähle ein "Serielles Gerät" aus.')
+            self.geConnectionInfoLabel.setText(self._translate("Form", 'Wähle ein Gerät aus.'))
             return
         
         try:
@@ -341,7 +345,10 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             QgsMessageLog.logMessage('Exception:' + str(e))
 
     def connection_failed(self):
-        self.geConnectionInfoLabel.setText('Es konnte keine Verbindung zum Port "' + self.port + '" hergestellt werden.')
+        portStr1 = self._translate("Form", "noConnection1")
+        portStr2 = self._translate("Form", "noConnection2")
+
+        self.geConnectionInfoLabel.setText(portStr1 + self.port + portStr2)
         self.geConnectionInfoLabel.setStyleSheet("color: red;")
 
         self.lfbGetCoordinatesGtn.setEnabled(True)

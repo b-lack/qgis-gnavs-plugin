@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1044</width>
-    <height>843</height>
+    <width>798</width>
+    <height>767</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -183,7 +183,7 @@ background-color:#ddd;</string>
                 </font>
                </property>
                <property name="text">
-                <string> </string>
+                <string/>
                </property>
               </widget>
              </item>
@@ -313,7 +313,7 @@ background-color:#ddd;</string>
          <widget class="QPushButton" name="lfbTargetRemoveBtn">
           <property name="font">
            <font>
-            <pointsize>6</pointsize>
+            <pointsize>8</pointsize>
            </font>
           </property>
           <property name="styleSheet">
@@ -346,7 +346,7 @@ border: none;</string>
          <widget class="QPushButton" name="lfbTargetFokusBtn">
           <property name="font">
            <font>
-            <pointsize>6</pointsize>
+            <pointsize>9</pointsize>
             <weight>75</weight>
             <bold>true</bold>
            </font>

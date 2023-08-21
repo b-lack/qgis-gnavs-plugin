@@ -89,12 +89,19 @@ class Target(QtWidgets.QWidget, UI_CLASS):
         else:
             #self.lfbTargetDetailsWidget.hide()
             self.lfbDistanceEdit.setText("-")
-            self.lfbDistanceUnit.setText("-")
+            self.lfbDistanceUnit.setText("km")
 
+
+        degUnit = Utils.getSetting('degUnit', 'deg')
+        if degUnit == 'deg':
+            self.lfbBearingUnit.setText("°")
+        elif  degUnit == 'gon':
+            self.lfbBearingUnit.setText("gon")
+        else:
+            self.lfbBearingUnit.setText("rad")
         if 'bearing' in self.targetElement:
             degUnit = Utils.getSetting('degUnit', 'deg')
 
-            self.lfbBearingLayout.show()
             rad = self.targetElement['bearing']
 
             deg = math.degrees(rad)
@@ -104,17 +111,12 @@ class Target(QtWidgets.QWidget, UI_CLASS):
 
             if degUnit == 'deg':
                 self.lfbBearingEdit.setText(str(round(deg, 2)))
-                self.lfbBearingUnit.setText("°")
             elif  degUnit == 'gon':
                 self.lfbBearingEdit.setText(str(round(gon, 2)))
-                self.lfbBearingUnit.setText("gon")
             else:
                 self.lfbBearingEdit.setText(str(round(rad, 2)))
-                self.lfbBearingUnit.setText("rad")
 
             
         else:
-            self.lfbBearingLayout.hide()
-            self.lfbBearingEdit.setText("")
-            self.lfbBearingUnit.setText("")
+            self.lfbBearingEdit.setText("-")
     

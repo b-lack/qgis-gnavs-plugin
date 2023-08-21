@@ -59,8 +59,6 @@ class Gnavs:
             'i18n',
             'gnavs_{}.qm'.format(locale))
         
-        QgsMessageLog.logMessage("locale_path: " + locale_path, "GNAVS")
-
         if os.path.exists(locale_path):
             self.translator = QTranslator()
             self.translator.load(locale_path)

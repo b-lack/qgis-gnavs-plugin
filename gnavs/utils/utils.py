@@ -205,8 +205,8 @@ class Utils(object):
         vl = QgsVectorLayer(type, layerName, "memory")
         QgsExpressionContextUtils.setLayerVariable(vl, 'LFB-NAME', layerName)
 
-        #if private:
-        #    vl.setFlags(QgsMapLayer.Private)
+        if private:
+            vl.setFlags(QgsMapLayer.Private)
         
         if fields is not None:
             fields = Utils.getGPSInfoFields()

@@ -122,12 +122,14 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         
 
     def updateSelectionLabel(self):
+        _translate = QtCore.QCoreApplication.translate
+
         if len(self.selectedFeatures) == 0:
-            self.lfbSelectionGroup.setTitle("Keine Ziel ausgewählt")
+            self.lfbSelectionGroup.setTitle(_translate("Form", "Keine Ziel ausgewählt"))
         if len(self.selectedFeatures) == 1:
-            self.lfbSelectionGroup.setTitle(str(len(self.selectedFeatures)) + " Ziel ausgewählt")
+            self.lfbSelectionGroup.setTitle(str(len(self.selectedFeatures)) + _translate("Form", "Ziel ausgewählt"))
         else:
-            self.lfbSelectionGroup.setTitle(str(len(self.selectedFeatures)) + " Ziele ausgewählt")
+            self.lfbSelectionGroup.setTitle(str(len(self.selectedFeatures)) + _translate("Form", "Ziele ausgewählt"))
 
         self.targets = self.createTargetList()
         self.updateSelectionTargets()

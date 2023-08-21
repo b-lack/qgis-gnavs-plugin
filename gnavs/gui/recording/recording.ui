@@ -29,10 +29,10 @@
    <item>
     <layout class="QVBoxLayout" name="lfbRecording">
      <property name="topMargin">
-      <number>0</number>
+      <number>10</number>
      </property>
      <property name="bottomMargin">
-      <number>0</number>
+      <number>10</number>
      </property>
      <item>
       <widget class="QLabel" name="label">
@@ -225,7 +225,7 @@ QPushButton:enabled{
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Messungen</string>
+          <string>Measurements</string>
          </property>
         </widget>
        </item>

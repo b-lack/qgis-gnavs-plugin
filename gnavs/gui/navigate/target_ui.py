@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1044, 843)
+        Form.resize(798, 767)
         self.gridLayout = QtWidgets.QGridLayout(Form)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setVerticalSpacing(15)
@@ -89,6 +89,7 @@ class Ui_Form(object):
         font = QtGui.QFont()
         font.setPointSize(12)
         self.lfbDistanceEdit.setFont(font)
+        self.lfbDistanceEdit.setText("")
         self.lfbDistanceEdit.setObjectName("lfbDistanceEdit")
         self.horizontalLayout_2.addWidget(self.lfbDistanceEdit)
         self.lfbDistanceUnit = QtWidgets.QLabel(self.lfbTargetDetailsWidget)
@@ -151,7 +152,7 @@ class Ui_Form(object):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
         self.lfbTargetRemoveBtn = QtWidgets.QPushButton(self.lfbTargetGroup)
         font = QtGui.QFont()
-        font.setPointSize(6)
+        font.setPointSize(8)
         self.lfbTargetRemoveBtn.setFont(font)
         self.lfbTargetRemoveBtn.setStyleSheet("background-color: transparent;\n"
 "color: red;\n"
@@ -162,7 +163,7 @@ class Ui_Form(object):
         self.horizontalLayout_3.addItem(spacerItem1)
         self.lfbTargetFokusBtn = QtWidgets.QPushButton(self.lfbTargetGroup)
         font = QtGui.QFont()
-        font.setPointSize(6)
+        font.setPointSize(9)
         font.setBold(True)
         font.setWeight(75)
         self.lfbTargetFokusBtn.setFont(font)
@@ -192,7 +193,6 @@ class Ui_Form(object):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
         self.label_3.setText(_translate("Form", "Entfernung"))
-        self.lfbDistanceEdit.setText(_translate("Form", " "))
         self.lfbDistanceUnit.setText(_translate("Form", "m"))
         self.label_4.setText(_translate("Form", "Azimut"))
         self.lfbBearingUnit.setText(_translate("Form", "gon"))
