@@ -27,7 +27,7 @@ tags=location, navigation, point, recording
 
 homepage=https://github.com/b-lack/search-gnavs-plugin
 
-icon=assets/gnavs-icon.png
+icon=icon.png
 # experimental flag
 experimental=True
 

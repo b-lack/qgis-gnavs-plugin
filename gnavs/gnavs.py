@@ -25,10 +25,9 @@ from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
-from qgis.core import QgsMessageLog
-
 # Initialize Qt resources from file resources.py
 #from .resources import *
+from . import resources
 
 # Import the code for the DockWidget
 from .gui.gnavs_dockwidget import GnavsDockWidget
@@ -155,10 +154,11 @@ class Gnavs:
             action.setWhatsThis(whats_this)
 
         if add_to_toolbar:
-            self.toolbar.addAction(action)
+            self.iface.addToolBarIcon(action)
+            #self.toolbar.addAction(action)
 
         if add_to_menu:
-            self.iface.addPluginToMenu(
+            self.iface.addPluginToVectorMenu(
                 self.menu,
                 action)
 
@@ -170,12 +170,15 @@ class Gnavs:
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
 
-        icon_path = ':/plugins/gnavs/assets/gnavs-icon.png'
+        icon_path = ':/plugins/gnavs/icon.png'
         self.add_action(
             icon_path,
             text=self.tr(u'GNAVS - Navigate and Save'),
             callback=self.run,
-            parent=self.iface.mainWindow())
+            parent=self.iface.mainWindow()
+        )
+
+        self.first_start = True
 
     #--------------------------------------------------------------------------
 
@@ -202,7 +205,7 @@ class Gnavs:
         #print "** UNLOAD FindLocation"
 
         for action in self.actions:
-            self.iface.removePluginMenu(
+            self.iface.removePluginVectorMenu(
                 self.tr(u'&GNAVS - Navigate and Save'),
                 action)
             self.iface.removeToolBarIcon(action)

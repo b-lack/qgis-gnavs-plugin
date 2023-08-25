@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="plugins/gnavs" >
-        <file alias="icon.png">assets/gnavs-icon.png</file>
+        <file>icon.png</file>
     </qresource>
 </RCC>

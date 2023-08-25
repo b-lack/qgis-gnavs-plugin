@@ -1,5 +1,5 @@
 <h1>
-  <img src="./gnavs/assets/gnavs-icon.png" alt="Logo Plugin"/>
+  <img src="./gnavs/icon.png" alt="Logo Plugin"/>
   GNAVS - GNSS Navigate and Save
 </h1>
 
