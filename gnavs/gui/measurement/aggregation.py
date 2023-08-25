@@ -8,12 +8,6 @@ import time
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QDialog
 from PyQt5 import QtCore
-from qgis.PyQt.QtCore import QSettings, QTimer
-from datetime import datetime
-
-
-
-from qgis.core import QgsSettings, QgsApplication, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection
 
 from ...utils.utils import Utils
 
@@ -21,6 +15,10 @@ from ...utils.utils import Utils
 UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'aggregation.ui'))
 
 class Aggregation(QtWidgets.QWidget, UI_CLASS):
+    """
+    Aggregation class.
+    Sets up the aggregation view, shows aggregated values.
+    """
 
     addToMap = QtCore.pyqtSignal(object, list)
 
@@ -32,26 +30,22 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
 
         self.settings = None
 
-        #self.lfbAddToMapBtn.clicked.connect(self.emitData)
         self.lfbAddToMapBtn.setEnabled(False)
 
         self.lfbAddToMapWidget.hide()
 
     def emitData(self):
+        """Adds point feature to map and emit the aggregated values to the main view"""
+
         self.getTextFields()
         self.lfbAddToMapBtn.setEnabled(False)
 
         Utils.addPointToLayer('lfb-gnavs-aggregated', self.aggregatedValues, self.gpsInfos)
-
-        directory = Utils.getSetting('directory', None)
-
-        #if directory is not None:
-            #Utils.saveDraftPath(directory, 'lfb-gnavs-aggregated')
-
-        #self.addToMap.emit(self.aggregatedValues, self.gpsInfos)
         self.reset()
 
     def updateAggregatedValues(self, gpsInfos):
+        """Update the aggregated values"""
+
         self.lfbAddToMapBtn.setEnabled(True)
 
         self.gpsInfos = gpsInfos
@@ -59,6 +53,8 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         self.printAggregatedValues(self.aggregatedValues)
 
     def refreshSettings(self):
+        """Gets all relevant settings for aggregation"""
+
         self.settings = {
             "meassurementSetting": Utils.getSetting('meassurementSetting', 100),
             "bestMeassurementSetting": Utils.getSetting('bestMeassurementSetting', 70),
@@ -67,12 +63,16 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         }
 
     def middlePoint(self, list, aggregationType='mean'):
+        """Calculates mean or median of values in list"""
+
         if aggregationType == 'median':
             return statistics.median(list)
         else:
             return statistics.mean(list)
         
     def reset(self):
+        """Resets the aggregation view"""
+
         self.aggregatedValues = []
         self.printAggregatedValues(
             {
@@ -101,9 +101,7 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         )
 
     def aggregate(self, GPSInfos):
-
-        #For Realtime Changes
-        #self.refreshSettings()
+        """Aggregates the GPSInfos"""
 
         if self.settings == None:
             self.refreshSettings()
@@ -119,9 +117,6 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
 
         listBestMeasurements = GPSInfos[:besteMeasurements]
         aggregationType = self.settings['aggregationType']
-
-        #self.lfbGPSaggregationType.setText(aggregationType.capitalize())
-
 
         latitude = [d['latitude'] for d in listBestMeasurements]
         longitude = [d['longitude'] for d in listBestMeasurements]
@@ -163,6 +158,8 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         }
     
     def getTextFields(self):
+        """Gets the text from the view"""
+
         if self.aggregatedValues == None:
             return
         
@@ -171,7 +168,8 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         self.aggregatedValues['description'] = self.lfbGPSDescription.toPlainText()
 
     def printAggregatedValues(self, aggregatedValues, clear=False):
-        #self.lfbGPSCount.setText( str(aggregatedValues['measurementLength']) )
+        """Prints the aggregated values to the view"""
+
         self.lfbGPSCountBest.setText( str(aggregatedValues['measurementsUsedCount']) )
         self.lfbGPSLat.setText( str(round(aggregatedValues['latitude'], 8)) ) # 1.11 mm
         self.lfbGPSLon.setText( str(round(aggregatedValues['longitude'], 8)) ) # 1.11 mm

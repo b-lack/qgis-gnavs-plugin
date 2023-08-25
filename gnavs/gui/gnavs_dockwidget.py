@@ -24,12 +24,10 @@
 
 import os
 
-from qgis.PyQt import QtGui, QtWidgets, uic
+from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal
 
-from qgis.core import QgsMessageLog
-
-from qgis.PyQt.QtWidgets import QDialog, QScroller
+from qgis.PyQt.QtWidgets import QScroller
 
 from .setup.setup import Setup
 from .setup.settings import Settings
@@ -39,6 +37,10 @@ from .recording.toggle_buttons import ToggleButtons
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'gnavs_dockwidget_base.ui'))
 
 class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
+    """
+    DockWidget class. 
+    Sets up the main views (Setup() + Settings()) and navigation (ToggleButtons()) between view.
+    """
 
     closingPlugin = pyqtSignal()
 
@@ -53,28 +55,19 @@ class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
 
-
         scroll = QScroller.scroller(self.lfbScrollArea.viewport())
-        scroll.grabGesture(self.lfbScrollArea.viewport(), QScroller.LeftMouseButtonGesture)
+        scroll.grabGesture(self.lfbScrollArea.viewport(), QScroller.LeftMouseButtonGesture) # Add tablet scrolling support
 
-        self.setupDevice = Setup(interface, 10)
+        self.setupDevice = Setup(interface)
         self.setupDevice.measurementCountChanged.connect(self.lfbMeasurementCountChanged)
         self.geMainLayout.addWidget(self.setupDevice)
 
-        self.Settings = Settings(interface, 10)
+        self.Settings = Settings(interface)
         self.geMainLayout.addWidget(self.Settings)
-
-        #self.lfbHomeBtn.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_ArrowLeft))
-        #self.lfbHomeBtn.clicked.connect(self.toHome)
-
-        #self.lfbSettingsBtn.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_MessageBoxInformation))
-        #self.lfbSettingsBtn.clicked.connect(self.toSettings)
 
         toggleButtons = ToggleButtons(interface)
         toggleButtons.change.connect(self.toggleButtonsChanged)
         self.lfbMenuBarLayout.insertWidget(0, toggleButtons)
-
-        
 
         self.lfbAddToMapBtn.clicked.connect(self.addToMap)
 
@@ -82,52 +75,52 @@ class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.toggleButtonsChanged('navigation')
 
     def addToMap(self):
+        """Add the recorded points to the map"""
+
         self.setupDevice.addDataToMap()
         self.lfbAddToMapBtn.setEnabled(False)
 
     def lfbMeasurementCountChanged(self, count):
+        """Enable the add to map button if there are points to add"""
+
         if count > 0:
             self.lfbAddToMapBtn.setEnabled(True)
         else:
             self.lfbAddToMapBtn.setEnabled(False)
 
     def toggleButtonsChanged(self, state):
+        """Toggle between the home and settings view"""
+
         if state == 'settings':
             self.toSettings()
         else:
             self.toHome()
 
+            if state == 'point':
+                self.lfbAddToMapWidget.show()
+            else:
+                self.lfbAddToMapWidget.hide()
+
         self.setupDevice.toggleButtonsChanged(state)
 
-        if state == 'point':
-            self.lfbAddToMapWidget.show()
-        else:
-            self.lfbAddToMapWidget.hide()
-
     def toHome(self):
-        #self.lfbHomeBtn.hide()
-        #self.lfbSettingsBtn.show()
+        """Show the Navigation / Point Recording view"""
 
         self.setupDevice.show()
         self.Settings.hide()
-        #self.setupDevice.stateChanged(state)
 
     
     def toSettings(self):
-        #self.lfbHomeBtn.show()
-        #self.lfbSettingsBtn.hide()
+        """Show the Settings view"""
 
         self.setupDevice.hide()
         self.Settings.show()
 
     def closeEvent(self, event):
-
-        # remove private Layers
-        Utils.removeLayer(['lfb-tmp-position', 'lfb-tmp-distance'])
-        self.setupDevice.stopTracking()
-        # del self.setupDevice
-
-        QgsMessageLog.logMessage('GnavsDockWidget: closeEvent', 'LFB')
+        """Run on close of the plugin"""
+        
+        Utils.removeLayer(['lfb-tmp-position', 'lfb-tmp-distance']) # Remove the temporary layers
+        self.setupDevice.stopTracking() # Stop the tracking if it is running
        
         self.closingPlugin.emit()
         event.accept()

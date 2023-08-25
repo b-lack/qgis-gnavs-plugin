@@ -11,7 +11,13 @@ from qgis.core import QgsMessageLog
 
 UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'indicator.ui'))
 
+# TODO: Not implemented yet
+
 class Indicator(QtWidgets.QWidget, UI_CLASS):
+    """
+    Indicator class.
+    Sets up a colored indicator view, shows the current GPS coordinates and accuracy.
+    """
 
     toggleFocus = QtCore.pyqtSignal(bool)
     focus = QtCore.pyqtSignal()
@@ -23,8 +29,8 @@ class Indicator(QtWidgets.QWidget, UI_CLASS):
         self.setupUi(self)
 
     def getColor(self, gpsInfo):
-        QgsMessageLog.logMessage('getColor', 'LFB')
-        QgsMessageLog.logMessage(str(gpsInfo), 'LFB')
+        """Returns the color of the indicator"""
+
         if gpsInfo is None or gpsInfo.latitude is None or gpsInfo.longitude is None:
             return 'red'
 

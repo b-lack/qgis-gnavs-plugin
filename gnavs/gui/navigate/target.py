@@ -3,10 +3,8 @@ import os
 import math
 
 from qgis.PyQt import QtWidgets, uic
-from qgis.PyQt.QtWidgets import QDialog, QScroller, QTableWidgetItem
+from qgis.PyQt.QtWidgets import QDialog, QTableWidgetItem
 from PyQt5 import QtCore
-
-from qgis.core import QgsSettings, QgsApplication, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection
 
 from ...utils.utils import Utils
 
@@ -14,6 +12,10 @@ from ...utils.utils import Utils
 UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'target.ui'))
 
 class Target(QtWidgets.QWidget, UI_CLASS):
+    """
+    Target class.
+    Sets up the target view, shows the selected target and updates distances and bearings.
+    """
 
     def __init__(self, interface, targetElement=None):
         """Constructor."""
@@ -24,35 +26,36 @@ class Target(QtWidgets.QWidget, UI_CLASS):
         self.interface = interface
         self.targetElement = targetElement
 
-        #scroll = QScroller.scroller(self.lfbAttributesLine.viewport())
-        #scroll.grabGesture(self.lfbAttributesLine.viewport(), QScroller.LeftMouseButtonGesture)
-
         self.lfbTargetRemoveBtn.clicked.connect(self.removeTargetSelection)
         self.lfbTargetFokusBtn.clicked.connect(self.fokusToTarget)
-
 
         self.updateValues()
         self.updateAttributeTableView()
 
     def removeTargetSelection(self):
+        """Deselect target"""
         Utils.deselectFeature(self.targetElement['layer'], self.targetElement['feature'])
     
     def fokusToTarget(self):
+        """Center map to target"""
         Utils.centerFeature(self.targetElement['feature'])
 
-
-    def updateAttributesList(self):
-        feature = self.targetElement['feature']
-        attrs = feature.attributes()
-
-        provider = self.targetElement['layer'].dataProvider()
-        field_names = [field.name() for field in provider.fields()]
-
-        for i, attr in enumerate(attrs):
-            label = QtWidgets.QLabel(field_names[i] + ': ' + str(attr))
-            self.lfbAttributeLayout.addWidget(label)
+    # Deprecated
+    #def updateAttributesList(self):
+    #    """Show/Update the list of feature attributes"""
+    #
+    #    feature = self.targetElement['feature']
+    #    attrs = feature.attributes()
+    #
+    #    provider = self.targetElement['layer'].dataProvider()
+    #    field_names = [field.name() for field in provider.fields()]
+    #
+    #    for i, attr in enumerate(attrs):
+    #        label = QtWidgets.QLabel(field_names[i] + ': ' + str(attr))
+    #        self.lfbAttributeLayout.addWidget(label)
 
     def updateAttributeTableView(self):
+        """Show/Update the table of feature attributes"""
         feature = self.targetElement['feature']
         attrs = feature.attributes()
 
@@ -74,6 +77,7 @@ class Target(QtWidgets.QWidget, UI_CLASS):
             self.lfbAttributeTableWidget.setItem(0 , i, item)
     
     def updateValues(self):
+        """Update the distance and bearing values"""
 
         if 'distance' in self.targetElement:
             #self.lfbTargetDetailsWidget.show()

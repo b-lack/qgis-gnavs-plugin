@@ -4,23 +4,21 @@ import json
 
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QDialog, QListWidgetItem
-from PyQt5 import QtCore, QtGui
-from qgis.PyQt.QtCore import QTimer, QSettings
-
-from qgis.core import  QgsMessageLog
+from qgis.PyQt.QtCore import QTimer
 
 from ...utils.utils import Utils
 
-from ..recording.recording import Recording
-from ..navigate.selection import Selection
 
 
 UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'settings.ui'))
 
 class Settings(QtWidgets.QWidget, UI_CLASS):
+    """
+    Settings class.
+    Sets up the settings view, shows saved settings.
+    """
 
-
-    def __init__(self, interface, bestCount=5):
+    def __init__(self, interface):
         """Constructor."""
 
         QDialog.__init__(self, interface.mainWindow())
@@ -32,13 +30,9 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
 
 
         directory = Utils.getLayerDirectory('lfb-gnavs-aggregated')
-        #if directory is None:
-        #   directory = Utils.getSetting('directory', None)
 
         self.lfbFileSelectionFileWidget.setFilePath(directory)
         self.lfbFileSelectionFileWidget.fileChanged.connect(self.directoryEntered)
-
-
 
         # Degrees
         self.degUnits = [
@@ -79,8 +73,6 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
             {"name": "mean", "value": "mean"},
             {"name": "median", "value": "median"}
         ]
-        #validator = QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]{1,4}"), self)
-        #self.lfbSettingsMeassurements.setValidator(validator)
 
         unitSetting = Utils.getSetting('aggregationType', 'mean')
         for index, aggregation in enumerate(self.aggregationTpes):
@@ -106,9 +98,7 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbSettingsPercentBox.currentIndexChanged.connect(self.bestMeassurementsChanged)
 
-        # list widget items
         self.selectedItem = None
-
 
         # "direction": True <- small to big
         # "direction": False <- big to small
@@ -144,6 +134,8 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
 
 
     def directoryEntered(self, directory):
+        """Save location of the output file"""
+
         Utils.setSetting('directory', directory)
         
         if directory is None or directory == '':
@@ -156,22 +148,31 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         Utils.saveLayerAsFile('lfb-gnavs-aggregated')
 
     def aggregationChanged(self, item):
+        """Save the aggregation type"""
+
         saveValue = self.aggregationTpes[item]['value']
         Utils.setSetting('aggregationType', saveValue)
 
     def degUnitChanged(self, item):
+        """Save the degree unit"""
+
         saveValue = self.degUnits[item]['value']
         Utils.setSetting('degUnit', saveValue)
 
     def meassurementChanged(self, item):
+        """Save the meassurements counter"""
+
         saveValue = self.meassurements[item]['value']
         Utils.setSetting('meassurementSetting', saveValue)
     
     def bestMeassurementsChanged(self, item):
+        """Save the best meassurement percentage"""
+
         saveValue = self.bestMeassurements[item]['value']
         Utils.setSetting('bestMeassurementSetting', saveValue)
 
     def checkButtons(self):
+        """Check if the selected item can be moved up or down"""
 
         self.selectedItem = self.lfbGpsInfoSortingList.currentItem()
         
@@ -191,14 +192,18 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
             self.lfbSortDownBtn.setEnabled(True)
 
     def resetSorting(self):
+        """Reset the sorting priority to the default values"""
+
         self.items = self.defaultSorting
         self.addItemsToList()
 
     def saveSorting(self):
+        """Save the sorting priority"""
         Utils.setSetting('sortingValues', json.dumps(self.items))
         
 
     def addItemsToList(self):
+        """Build the sorting priority list"""
 
         self.lfbGpsInfoSortingList.clear()
 
@@ -206,25 +211,30 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
             item = QListWidgetItem(itemText['name'])
             self.lfbGpsInfoSortingList.addItem(item)
 
-        #Utils.setSetting('sortingValues', json.dumps(self.items))
         self.connectionTimer.timeout.connect(self.saveSorting)
         self.connectionTimer.start(1000)
 
     def itemSelected(self):
+        """Enables sorting up or down buttons if an item is selected"""
+
         self.lfbSortUpBtn.setEnabled(True)
         self.lfbSortDownBtn.setEnabled(True)
        
-
         self.selectedItem = self.lfbGpsInfoSortingList.currentItem()
 
         
     def findItemPosition(self, item):
+        """ return the position of an item in the list
+        Find the position of an item in the list
+        """
+
         for index, itemText in enumerate(self.items):
             if itemText['name'] == item:
                 return index, itemText
         return -1, None
 
     def sortUp(self):
+        """Move the selected item up in the list"""
 
         self.selectedItem = self.lfbGpsInfoSortingList.currentItem()
 
@@ -240,6 +250,7 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         self.checkButtons()
     
     def sortDown(self):
+        """Move the selected item down in the list"""
 
         self.selectedItem = self.lfbGpsInfoSortingList.currentItem()
         

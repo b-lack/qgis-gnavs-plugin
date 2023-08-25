@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 
 zip_build
+*_ui.py
+*.qm

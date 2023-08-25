@@ -4,14 +4,15 @@ import os
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QDialog
 from PyQt5 import QtCore
-from qgis.PyQt.QtCore import QSettings, QTimer
-from datetime import datetime
-from qgis.core import QgsMessageLog
 
 
 UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'focus.ui'))
 
 class Focus(QtWidgets.QWidget, UI_CLASS):
+    """
+    Focus class.
+    Sets up buttons to follow GPS coordinates or one time center map.
+    """
 
     toggleFocus = QtCore.pyqtSignal(bool)
     focus = QtCore.pyqtSignal()
@@ -26,10 +27,13 @@ class Focus(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbFollowRadioBtn.toggled.connect(self.toggleTheFocus)
         self.lfbFollowQuickBtn.clicked.connect(self.focusQuick)
+        self.lfbFollowQuickBtn.hide()
 
     def focusQuick(self):
+        """Focus the map to the current GPS coordinates"""
         self.focus.emit()
 
 
     def toggleTheFocus(self, isNavigation):
-       self.toggleFocus.emit(isNavigation)
+        """Toggle the focus mode"""
+        self.toggleFocus.emit(isNavigation)

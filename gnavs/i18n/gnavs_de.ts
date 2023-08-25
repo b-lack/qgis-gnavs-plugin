@@ -63,7 +63,7 @@
     </message>
 
     <message>
-        <source>noConncetion1</source>
+        <source>noConnection1</source>
         <translation>Es konnte keine Verbindung zum Port </translation>
     </message>
     <message>

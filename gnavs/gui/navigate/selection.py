@@ -16,6 +16,10 @@ from .target import Target
 UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'selection.ui'))
 
 class Selection(QtWidgets.QWidget, UI_CLASS):
+    """
+    Selection class.
+    Sets up the selection view, shows selected features and updates distances and bearings.
+    """
 
     def __init__(self, interface, selectedFeature=None):
         """Constructor."""
@@ -31,6 +35,7 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         self.updateToC()
 
     def updateToC(self):
+        """Update the Table of Contents"""
 
         layers = Utils.selectLayerByType(QgsWkbTypes.PointGeometry)
 
@@ -47,6 +52,8 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
 
 
     def updateCoordinates(self, gpsInfo):
+        """Update the GPS coordinates and list of targets selected by the user"""
+
         if gpsInfo is None or gpsInfo.latitude is None or gpsInfo.longitude is None:
             return
         
@@ -54,17 +61,14 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
 
         self.targets = self.createTargetList()
 
-        
-
-        
         position = QgsPointXY(QgsPoint(self.gpsInfo.longitude, self.gpsInfo.latitude))
         Utils.clearLayer('lfb-tmp-position', 'point')
         Utils.drawPosition('lfb-tmp-position', position)
 
-
         self.updateSelectionTargets()
 
     def createTargetList(self):
+        """Create a list of targets selected by the user"""
         targets = []
 
         
@@ -94,14 +98,14 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         return targets
     
     def updateSelectionTargets(self):
+        """Update the list of targets selected by the user"""
 
         while self.lfbSelectedTargets.count():
             child = self.lfbSelectedTargets.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
 
-        
-        
+
         Utils.clearLayer('lfb-tmp-distance', 'linestring')
         
         if  self.targets is not None and len(self.targets) > 0:
@@ -122,6 +126,8 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         
 
     def updateSelectionLabel(self):
+        """Update the label showing the number of selected features"""
+
         _translate = QtCore.QCoreApplication.translate
 
         if len(self.selectedFeatures) == 0:
@@ -135,13 +141,9 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         self.updateSelectionTargets()
 
     def layerSelectionChanged(self, selected=[''], deselected=[]):
+        """Update the list of selected features"""
 
-        #if selected is None or len(selected) == 0:
-        #    self.selectedFeatures.clear()
-        #else:
         self.selectedFeatures = Utils.getSelectedFeaturesFromAllLayers(QgsWkbTypes.PointGeometry)
 
-        
-        
         self.updateSelectionLabel()
     

@@ -169,6 +169,9 @@
        <property name="text">
         <string>Sortierung des Anteils an Messungen vor der Aggregation</string>
        </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -237,7 +240,7 @@ border: none;</string>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_7">
          <property name="rightMargin">
-          <number>20</number>
+          <number>0</number>
          </property>
          <item>
           <widget class="QListWidget" name="lfbGpsInfoSortingList">
@@ -249,16 +252,24 @@ border: none;</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Most important attributes up</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
       </layout>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_8">
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Most important attributes up</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

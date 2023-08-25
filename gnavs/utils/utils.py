@@ -11,7 +11,12 @@ from PyQt5.QtGui import QColor
 PLUGIN_NAME = "find_location"
 
 class Utils(object):
+    """
+    Utils class.
+    Contains all the helper functions.
+    """
 
+    # Fields for the resulting point layer
     point_fields = [
         
         ("fid", QVariant.Int),
@@ -48,24 +53,36 @@ class Utils(object):
     ]
 
     def getPluginByName(plugin_name):
+        """Get the plugin object by name."""
+
         return qgis.utils.plugins[plugin_name]
 
     def checkPluginExists(plugin_name):
+        """Check if the plugin exists."""
         return plugin_name in qgis.utils.plugins
     
-    def getPosition(self, name):
-        return 'position: ' + name
+    # _deprecated
+    #def getPosition(self, name):
+    #    return 'position: ' + name
     
     #Settings
     def getSerialPortSettings(self):
+        """Get the serial port settings."""
+
         s=QgsSettings()
         return s.value(Utils.getPluginName()+"/serialPort")
     
     def setSerialPortSettings(self, serialPort):
+        """Set the serial port settings."""
         s=QgsSettings()
         return s.setValue(Utils.getPluginName()+"/serialPort", serialPort)
     
     def getSetting(name, default=None):
+        """ return the setting value
+        Get the plugin setting by name.
+        If the setting does not exist, create it with the default value
+        """
+
         setting = QgsSettings().value(Utils.getPluginName()+"/" + name)
         if setting == None:
             if default is not None:
@@ -74,40 +91,56 @@ class Utils(object):
         return setting
     
     def setSetting(name, value):
+        """Set the setting by name and value."""
+
         QgsSettings().setValue(Utils.getPluginName()+"/" + name, value)
         return
     
     def getPluginName():
+        """Get the plugin name."""
+
         return PLUGIN_NAME
     
     def getSerialPorts():
+        """Get the serial ports available."""
+
         ports = QgsGpsDetector.availablePorts()
         return ports
     
     def distanceFromPoints(point1, point2):
+        """Calculate the distance between two points."""
+
         distance = QgsDistanceArea()
         units = distance.lengthUnits()
         distance.setEllipsoid('WGS84')
         return distance.measureLine(point1, point2)
     
     def bearingFromPoints(point1, point2):
+        """Calculate the bearing between two points."""
+
         distance = QgsDistanceArea()
         units = distance.lengthUnits()
         distance.setEllipsoid('WGS84')
         return distance.bearing(point1, point2)
         
     def deselectFeature(layer, feature):
+        """Deselect a feature from a layer by ID."""
+
         layer.deselect(feature.id())
 
     def fokusToFeature(feature):
+        """Zoom to a feature."""
+
         iface.mapCanvas().zoomToFeatureExtent(feature.geometry().boundingBox())
     
     def focusToXY(x, y, zoom = 150000):
+        """Center map to a coordinate."""
+
         iface.mapCanvas().setCenter(QgsPointXY(x, y))
-        #current_scale =  iface.mapCanvas().scale()
-        #iface.mapCanvas().zoomScale(min(zoom, current_scale))
 
     def transformCoordinates(geom):
+        """Transform coordinates from WGS84 to the current project CRS."""
+
         crs = QgsProject.instance().crs().authid()
     
         sourceCrs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
@@ -118,6 +151,7 @@ class Utils(object):
         return geom
 
     def centerFeature(feature, zoom = 150000):
+        """Center (zoom) map to a feature."""
         geom = feature.geometry()
         coordinates = geom.asPoint()
 
@@ -129,8 +163,8 @@ class Utils(object):
         current_scale =  iface.mapCanvas().scale()
         iface.mapCanvas().zoomScale(min(zoom, current_scale))
 
-    # QgsWkbTypes.PointGeometry
     def getSelectedFeaturesFromAllLayers(geometryType):
+        """Get all selected features from all layers."""
 
         features = []
 
@@ -143,13 +177,11 @@ class Utils(object):
                         'layer': layer,
                         'feature': feature
                     })
-                #features = features + layer.selectedFeatures()
-                #features.append(layer.selectedFeatures())
 
         return features
     
-    # QgsWkbTypes.PointGeometry
     def selectLayerByType(geometryType):
+        """List all layers with geometry type."""
 
         layerList = []
 
@@ -166,11 +198,14 @@ class Utils(object):
         return layerList
     
     def setFields(self):
+        """Set the fields for the point layer."""
         fields = QgsFields()
         fields.append(QgsField("id", QVariant.String))
         return fields
     
     def setStyle(layer, type):
+        """Set the style for a point/linestring layer."""
+
         renderer = layer.renderer()
         symbol = renderer.symbol()
 
@@ -185,12 +220,13 @@ class Utils(object):
             symbol.setColor(QColor(255,255,1, 155))
             symbol.setWidth(1)
 
-        #symbol.symbolLayer(0).setStrokeColor(QColor(255,255,1))
-        #symbol.symbolLayer(0).setStrokeWidth(3)
-
         layer.triggerRepaint()
     
     def getPrivateLayers(layerName, type, private=True, addStyle=True, fields=None):
+        """
+        Get the private layer by name.
+        If the layer does not exist, create it.
+        """
 
         names = [layer for layer in QgsProject.instance().mapLayers().values()]
 
@@ -222,6 +258,8 @@ class Utils(object):
         return vl
     
     def getLayerDirectory(layerName):
+        """Get the layer directory by name."""
+
         layer = Utils.getLayerById(layerName)
 
         if layer is None:
@@ -235,6 +273,8 @@ class Utils(object):
             return path + '.gpkg'
     
     def saveLayerAsFile(layerName):
+        """Save the vector layer by Name."""
+
         pathToBeSet = Utils.getSetting('directory')
         layer = Utils.getLayerById(layerName)
 
@@ -249,6 +289,8 @@ class Utils(object):
             print("error")
 
     def saveDraftPath(directory, layerName):
+        """Save the vector layer in the given directory."""
+
         layers = QgsProject.instance().mapLayers().values()
 
         for layer in layers:
@@ -263,6 +305,8 @@ class Utils(object):
                     print("error")
 
     def clearLayer(layerName, type='point'):
+        """Clear a layer by name and type."""
+
         layer = Utils.getPrivateLayers(layerName, type)
 
         if layer is None:
@@ -277,13 +321,17 @@ class Utils(object):
         layer.endEditCommand()
 
     def removeLayer(layerNames):
+        """Remove layers by name."""
         layers = QgsProject.instance().mapLayers().values()
 
         for layer in layers:
             if QgsExpressionContextUtils.layerScope(layer).variable('LFB-NAME') in layerNames :
                 QgsProject.instance().removeMapLayer(layer.id())
 
+
     def layersToTop(layerNames):
+        """Move layers to the top of the layer list"""
+        # TODO: Put Layer to top of the layer list
 
         return
 
@@ -346,6 +394,8 @@ class Utils(object):
         iface.layerTreeCanvasBridge().setCustomLayerOrder( order )
 
     def drawDistance(layerName, startPoint, endPoint):
+        """Draw a line between two points."""
+
         layer = Utils.getPrivateLayers(layerName, 'linestring')
 
         if layer is None:
@@ -360,6 +410,8 @@ class Utils(object):
         layer.endEditCommand()
     
     def drawPosition(layerName, startPoint):
+        """Draw a point at given position."""
+
         layer = Utils.getPrivateLayers(layerName, 'point')
 
         if layer is None:
@@ -374,6 +426,7 @@ class Utils(object):
         layer.endEditCommand()
 
     def createFeatureFromGpsInfos(gpsInfos, fields):
+        """Create a feature from GPS infos."""
         
         feature =  QgsFeature()
 
@@ -391,6 +444,8 @@ class Utils(object):
     
     
     def getLayerById(layerName):
+        """Get the layer by name."""
+
         layers = QgsProject.instance().mapLayers().values()
 
         layerId1 = re.sub('[^a-zA-Z0-9 \n\.]', '', layerName)
@@ -403,6 +458,7 @@ class Utils(object):
         return None
 
     def addPointToLayer(layerName, aggregatedValues, gpsInfos):
+        """Add a point to the layer."""
 
         layer = Utils.getLayerById(layerName)
 
@@ -426,6 +482,8 @@ class Utils(object):
         layer.endEditCommand()
     
     def getGPSInfoFields():
+        """Append the GPS info fields."""
+
         fields = QgsFields()
 
         for field in Utils.point_fields:

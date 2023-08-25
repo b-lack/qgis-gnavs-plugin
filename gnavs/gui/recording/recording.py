@@ -1,18 +1,12 @@
 
 import os
 import json
-import statistics
-import time
 import random
-
 
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QDialog
 from PyQt5 import QtCore
 from qgis.PyQt.QtCore import QTimer
-from datetime import datetime
-
-
 
 from qgis.core import QgsSettings, QgsApplication, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection
 
@@ -23,6 +17,10 @@ from ...utils.utils import Utils
 UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'recording.ui'))
 
 class Recording(QtWidgets.QWidget, UI_CLASS):
+    """
+    Recording class.
+    Gets GPS Info from selected serial port.
+    """
 
     aggregatedValuesChanged = QtCore.pyqtSignal(object)
     currentPositionChanged = QtCore.pyqtSignal(object)
@@ -84,34 +82,36 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbValidIndicator.setStyleSheet("background-color: gray; border-radius: 5px;")
         
+    # Deprecated: Replaced by ToggleButtons
+    #def toggleButtonsChanged(self, value):
+    #    self.recordingStyle = value
+    #    self.cangeState()
 
-    def __del__(self):
-        pass
-
-    def toggleButtonsChanged(self, value):
-        self.recordingStyle = value
-        self.cangeState()
-
-    def focusQuick(self):
-        self.setFocus()
+    # Deprecated: Replaced by setFocus
+    #def focusQuick(self):
+    #       self.setFocus()
     
     def toggleFocus(self, isNavigation):
+        """Toggle between the tracking and not tracking """
         self.keepFocus = isNavigation
 
     def setFocus(self):
+        """Set the center of the map canvas to last GPS position"""
         if self.lastGPSInfo is not None:
             Utils.focusToXY(self.lastGPSInfo.longitude, self.lastGPSInfo.latitude)
 
-    def cangeState(self):
-        return
-        if self.recordingStyle == 'navigation':
-            self.lfbGetCoordinatesGtn.setText("NAVIGIEREN")
-            self.lfbCancelCoordinatesBtn.setText("BEENDEN")
-        else:
-            self.lfbGetCoordinatesGtn.setText("AUFZEICHNEN")
-            self.lfbCancelCoordinatesBtn.setText("BEENDEN")
+#   Deprecated: unnecessary
+#   def cangeState(self):
+#        return
+#        if self.recordingStyle == 'navigation':
+#            self.lfbGetCoordinatesGtn.setText("NAVIGIEREN")
+#            self.lfbCancelCoordinatesBtn.setText("BEENDEN")
+#        else:
+#            self.lfbGetCoordinatesGtn.setText("AUFZEICHNEN")
+#            self.lfbCancelCoordinatesBtn.setText("BEENDEN")
 
     def refreshSettings(self):
+        """Set default QGIS settings"""
         self.settings = {
             "meassurementSetting": Utils.getSetting('meassurementSetting', 100),
             "bestMeassurementSetting": Utils.getSetting('bestMeassurementSetting', 70),
@@ -120,7 +120,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         }
     
     def updateSerialPortSelection(self):
-
+        """Update the serial port List"""
         self.ports = Utils.getSerialPorts()
 
         self.lfbSerialPortList.clear()
@@ -128,6 +128,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.lfbSerialPortList.addItem(port[0], port[0])
 
     def selectPort(self, port):
+        """Select a serial port"""
         index = self.lfbSerialPortList.findData(port)
         if index != -1 :
             self.lfbSerialPortList.setCurrentIndex(index)
@@ -137,9 +138,12 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.onSerialPortChanged(self.lfbSerialPortList.currentIndex())
 
     def getGPSSettings(self):
+        """Get the selected and saved serial port from Settings"""
         return QgsSettings().value('gps/gpsd-serial-device')
     
     def onSerialPortChanged(self, index):
+        """Update the serial port selection"""
+
         self.geConnectionInfoLabel.setText("")
 
         newPort = self.lfbSerialPortList.itemData(index)
@@ -148,12 +152,9 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             return
         
         self.port = self.lfbSerialPortList.itemData(index)
-        
-        #self.connectionTest(self.port)
-    
-        #self.port = self.lfbSerialPortList.itemData(index)
     
     def connectionEstablished(self):
+        """Check if a connection already exists and return it"""
         connectionRegistry = QgsApplication.gpsConnectionRegistry()
         connectionList = connectionRegistry.connectionList()
 
@@ -161,14 +162,10 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             return connectionList[0]
 
         return None
-        
-        #GPSInfo = connectionList[0].currentGPSInformation()
 
-        if len(connectionList) > 0:
-            #self.connection_succeed(connectionList[0], False)
-            return True
-
+    # Not yet implemented
     def connectionTest(self, port):
+        """Test the connection before starting the tracking"""
         if port is None:
             self.geConnectionInfoLabel.setText('Wähle ein "Serielles Gerät" aus.')
             self.geConnectionInfoLabel.setStyleSheet("color: red;")
@@ -190,8 +187,9 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
        
         self.gpsDetectorTest.advance()
 
-
+    # Not yet implemented
     def connectionTestFailed(self):
+        """Connection test fail before starting the tracking"""
         
         self.geConnectionInfoLabel.setText(self._translate("Form", "Verbindung fehlgeschlagen."))
         self.geConnectionInfoLabel.setStyleSheet("color: red;")
@@ -204,7 +202,9 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         except:
             pass
 
+    # Not yet implemented
     def connectionTestSucceed(self, connection):
+        """Connection test succeed before starting the tracking"""
         self.geConnectionInfoLabel.setText(self._translate("Form", "Verbindung erfolgreich."))
         self.geConnectionInfoLabel.setStyleSheet("color: green;")
         self.lfbSerialPortList.setEnabled(True)
@@ -220,7 +220,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
 
     def delayConnection(self, connection):
-        
+        """Delay the connection to the GPS device by 100 ms"""
 
         self.geConnectionInfoLabel.setText(self._translate("Form", "Port wird gestestet..."))
         self.geConnectionInfoLabel.setStyleSheet("color: gray;")
@@ -240,9 +240,9 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.connectionTimer.setSingleShot(True)
         self.connectionTimer.timeout.connect(self.connect)
         self.connectionTimer.start(100)
-        #self.connect()
 
     def connect(self):
+        """Setup connection to the GPS device"""
 
         connection = self.connectionEstablished()
         
@@ -273,6 +273,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
 
     def cancelConnection(self):
+        """Cancel an existing connection to the GPS device"""
+
         self.geConnectionInfoLabel.setText('Stopped')
         self.lfbValidIndicator.setStyleSheet("background-color: grey; border-radius: 5px;")
 
@@ -307,6 +309,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             pass
 
     def connection_succeed(self, connection, closeConnection=False):
+        """Connection succeed to the GPS device"""
+
         self.geConnectionInfoLabel.setText('Tracking...')
         self.geConnectionInfoLabel.setStyleSheet("color: green;")
 
@@ -318,7 +322,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         if not isinstance(connection, QgsNmeaConnection):
             import sip
             self.gpsCon =  sip.cast(connection, QgsGpsConnection)
-            #self.gpsCon = gpsConnection
 
         elif isinstance(connection, QgsGpsConnection):
             self.gpsCon = connection
@@ -335,7 +338,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.lfbCancelCoordinatesBtn.show()
 
             self.gpsCon.stateChanged.connect(self.status_changed)
-            #self.gpsCon.positionChanged.connect(self.position_changed)
             
             self.gps_active = True
 
@@ -345,10 +347,12 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             QgsMessageLog.logMessage('Exception:' + str(e))
 
     def connection_failed(self):
+        """Connection to the GPS device failed"""
+
         portStr1 = self._translate("Form", "noConnection1")
         portStr2 = self._translate("Form", "noConnection2")
 
-        self.geConnectionInfoLabel.setText(portStr1 + self.port + portStr2)
+        self.geConnectionInfoLabel.setText(portStr1 + ' ' + self.port + ' ' + portStr2)
         self.geConnectionInfoLabel.setStyleSheet("color: red;")
 
         self.lfbGetCoordinatesGtn.setEnabled(True)
@@ -358,7 +362,9 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbSerialPortList.setEnabled(True)
 
+    # not yet implemented
     def getQualityColor(self):
+        """Get the quality indicator color of the last GPS position"""
         if self.lastGPSInfo is None:
             return
         
@@ -373,10 +379,19 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             return 'yellow'
         else:
             return 'red'
+
+        if str(quaityIndicator) == 'GpsQualityIndicator.RTK':
+            return 1
+        elif str(quaityIndicator) == 'GpsQualityIndicator.FloatRTK':
+            return 2
+        elif str(quaityIndicator) == 'GpsQualityIndicator.GPS':
+            return 3
+        else:
+            return 10
             
 
     def status_changed(self, gpsInfo):
-
+        """Update the GPS position and emit values"""
         quality = gpsInfo.quality
         
         try:
@@ -394,29 +409,18 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             if self.keepFocus:
                 self.setFocus()
                 
-            self.emitAggregatedValues(gpsInfo)
+            self.createGPSObject(gpsInfo)
         except Exception as e:
            self.geConnectionInfoLabel.setText(str(e))
 
         
     def setMeasurementsCount(self):
+        """Set the number of measurements"""
         self.lfbGPSCount.setText(str(len(self.measures)))
 
-    def getQualityColor(self, gpsInfo):
+    def createGPSObject(self, GPSInfo):
+        """Create a GPS object and emit values"""
 
-        quaityIndicator = gpsInfo.qualityIndicator
-
-        if str(quaityIndicator) == 'GpsQualityIndicator.RTK':
-            return 1
-        elif str(quaityIndicator) == 'GpsQualityIndicator.FloatRTK':
-            return 2
-        elif str(quaityIndicator) == 'GpsQualityIndicator.GPS':
-            return 3
-        else:
-            return 10
-
-    def emitAggregatedValues(self, GPSInfo):
-        
         self.measures.insert(0, {
             'utcDateTime': GPSInfo.utcDateTime.currentMSecsSinceEpoch(),
             'latitude': GPSInfo.latitude,
@@ -427,7 +431,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             'hdop': GPSInfo.hdop,
             'satellitesUsed': GPSInfo.satellitesUsed,
             'quality': GPSInfo.quality,
-            'qualityIndicator': random.randint(0,10) #self.getQualityColor(GPSInfo),
+            'qualityIndicator': random.randint(0,10) #TODO: self.getQualityColor(GPSInfo),
         })
 
         self.setMeasurementsCount()
