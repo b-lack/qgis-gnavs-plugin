@@ -26,7 +26,8 @@ Bei erreichter Qualität können die Daten in einem GeoPackage gespeichert werde
 - Save the recorded points in a GeoPackage layer with relevant GNSS attributes
 
 ## Demo
-See the plugin live in action.
+See the plugin [in action](https://www.youtube.com/watch?v=PlruoQ83FbE).
+
 [![GNAVS - GNSS Navigate and Save](https://img.youtube.com/vi/PlruoQ83FbE/0.jpg)](https://www.youtube.com/watch?v=PlruoQ83FbE)
 
 
