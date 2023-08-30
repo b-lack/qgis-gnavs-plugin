@@ -25,7 +25,18 @@ Bei erreichter Qualität können die Daten in einem GeoPackage gespeichert werde
 - Recording of the current position
 - Save the recorded points in a GeoPackage layer with relevant GNSS attributes
 
-## Installation from Repository
+## Installation from official QGIS-Repository
+
+1. QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``Settings``
+
+2. Check: "Allow experimental plugins"
+
+3. QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``ALL``
+
+4. Search for `GNAVS` and select `Install Plugin`
+
+
+## Installation from GitHub-Repository
 
 1. QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``Settings``
 
