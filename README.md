@@ -73,7 +73,7 @@ This plugin is licensed under the [GNU GENERAL PUBLIC LICENSE](./LICENSE).
 
 Commissioned through the [Brandenburg State Forestry Office](https://forst.brandenburg.de/).
 
-- Concept by: [Torsten Wiebke](https://www.gruenecho.de/)
+- Concept by: Torsten Wiebke
 - Develpment by: [Gerrit Balindt](https://gruenecho.de/)
 
 
