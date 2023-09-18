@@ -83,7 +83,10 @@ class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def lfbMeasurementCountChanged(self, count):
         """Enable the add to map button if there are points to add"""
 
-        if count > 0:
+        meassurementSetting = Utils.getSetting('meassurementSetting', 100)
+        progress = round(count / int(meassurementSetting) * 100)
+
+        if progress >= 100:
             self.lfbAddToMapBtn.setEnabled(True)
         else:
             self.lfbAddToMapBtn.setEnabled(False)

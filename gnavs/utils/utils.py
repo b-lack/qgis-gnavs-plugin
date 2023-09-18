@@ -8,7 +8,7 @@ from qgis.utils import iface
 from qgis.PyQt.QtCore import QVariant, QDateTime, QFileInfo
 from PyQt5.QtGui import QColor
 
-PLUGIN_NAME = "find_location"
+PLUGIN_NAME = "gnavs"
 
 class Utils(object):
     """
@@ -66,6 +66,11 @@ class Utils(object):
     #    return 'position: ' + name
     
     #Settings
+    def getSettingsDirectory():
+        """Get the settings directory."""
+
+        return QgsSettings().fileName()
+    
     def getSerialPortSettings(self):
         """Get the serial port settings."""
 
@@ -343,7 +348,6 @@ class Utils(object):
 
         for layer in layers:
             if QgsExpressionContextUtils.layerScope(layer).variable('LFB-NAME') in layerNames :
-                QgsMessageLog.logMessage(str(layer.id()), 'LFB')
                 clone_layer = layer.clone()
                 QgsProject.instance().removeMapLayer(layer.id())
                 root.insertLayer(0, clone_layer)

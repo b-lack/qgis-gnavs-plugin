@@ -8,7 +8,7 @@ from qgis.PyQt.QtWidgets import QDialog
 from PyQt5 import QtCore
 from qgis.PyQt.QtCore import QTimer
 
-from qgis.core import QgsSettings, QgsApplication, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection
+from qgis.core import QgsSettings, QgsApplication, QgsMessageLog, QgsGpsDetector, QgsGpsConnection, QgsNmeaConnection, QgsPointXY, QgsPoint
 
 from ...utils.utils import Utils
 
@@ -24,6 +24,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
     aggregatedValuesChanged = QtCore.pyqtSignal(object)
     currentPositionChanged = QtCore.pyqtSignal(object)
+    recordingStateChanged = QtCore.pyqtSignal(bool)
 
     def __init__(self, interface, aggregate=True):
         """Constructor."""
@@ -32,7 +33,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.setupUi(self)
 
         self.refreshSettings()
-    
+        self.interface = interface
+
         self.measures = []
         self.measurementStart = None
         self.measurementEnd = None
@@ -69,7 +71,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         self.updateSerialPortSelection()
         self.lfbRefreshSerialListBtn.clicked.connect(self.updateSerialPortSelection)
-        self.lfbRefreshSerialListBtn.hide()
+        #self.lfbRefreshSerialListBtn.hide()
         self.lfbSerialPortList.currentIndexChanged.connect(self.onSerialPortChanged)
         
 
@@ -80,12 +82,18 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         if serialSetting is not None:
             self.selectPort(serialSetting)
 
+        self.lfbValidIndicator.hide()
         self.lfbValidIndicator.setStyleSheet("background-color: gray; border-radius: 5px;")
+
+        self.lfbRecordingPercent.setRange(0, 100)
+        self.lfbRecordingPercent.setContentsMargins(0,0,0,0)
+        self.lfbRecordingPercent.setValue(0)
         
-    # Deprecated: Replaced by ToggleButtons
-    #def toggleButtonsChanged(self, value):
-    #    self.recordingStyle = value
-    #    self.cangeState()
+        
+    def toggleButtonsChanged(self, value):
+        self.recordingStyle = value
+        self.setMeasurementsCount()
+        #self.cangeState()
 
     # Deprecated: Replaced by setFocus
     #def focusQuick(self):
@@ -233,7 +241,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbSerialPortList.setEnabled(False)
 
-        QgsSettings().setValue('gps/gpsd-serial-device', self.port)
+        #QgsSettings().setValue('gps/gpsd-serial-device', self.port)
 
 
         self.connectionTimer = QTimer()
@@ -272,7 +280,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.gpsDetector.advance()
 
 
-    def cancelConnection(self):
+    def cancelConnection(self, reset=True):
         """Cancel an existing connection to the GPS device"""
 
         self.geConnectionInfoLabel.setText('Stopped')
@@ -293,6 +301,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
                 self.gpsCon.close()
                 self.gpsCon = None
 
+                self.recordingStateChanged.emit(False)
            
 
             self.gps_active = False
@@ -303,7 +312,12 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.lfbGetCoordinatesGtn.show()
 
             self.measures = []
-            self.setMeasurementsCount()
+
+            if reset:
+                self.setMeasurementsCount()
+                self.getProgress()
+
+            
 
         except Exception as e:
             pass
@@ -315,7 +329,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.geConnectionInfoLabel.setStyleSheet("color: green;")
 
         if self.gpsCon is not None:
-            self.cancelConnection()
+            self.cancelConnection(False)
 
         # https://python.hotexamples.com/examples/PyQt5.QtSerialPort/QSerialPort/setDataBits/python-qserialport-setdatabits-method-examples.html
 
@@ -330,7 +344,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             return
         
         if closeConnection:
-            self.cancelConnection()
+            self.cancelConnection(False)
             return
 
         try:
@@ -338,6 +352,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.lfbCancelCoordinatesBtn.show()
 
             self.gpsCon.stateChanged.connect(self.status_changed)
+            self.recordingStateChanged.emit(True)
             
             self.gps_active = True
 
@@ -391,9 +406,10 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             
 
     def status_changed(self, gpsInfo):
+        
         """Update the GPS position and emit values"""
         quality = gpsInfo.quality
-        
+
         try:
             if quality == 0:
                 self.lfbValidIndicator.setStyleSheet("background-color: red; border-radius: 5px;")
@@ -413,10 +429,33 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         except Exception as e:
            self.geConnectionInfoLabel.setText(str(e))
 
+    def getProgress(self):
+        meassurementSetting = Utils.getSetting('meassurementSetting', 100)
+        self.lfbGPSCountSeperator.setText('/')
+        self.lfbGPSCountTotal.setText(str(meassurementSetting))
+
+        val = round(len(self.measures) / int(meassurementSetting) * 100)
+
+        self.lfbRecordingPercent.setValue(val)
+        self.lfbRecordingPercent.show()
+
+        return val
         
     def setMeasurementsCount(self):
         """Set the number of measurements"""
         self.lfbGPSCount.setText(str(len(self.measures)))
+
+        if self.recordingStyle == 'navigation':
+            self.lfbGPSCountTotal.hide()
+            self.lfbGPSCountSeperator.hide()
+            #self.lfbGPSCount.hide()
+            #self.label_2.hide()
+            self.lfbRecordingPercent.hide()
+        else:
+            self.lfbGPSCountTotal.show()
+            self.lfbGPSCountSeperator.show()
+            self.lfbGPSCount.show()
+            self.label_2.show()
 
     def createGPSObject(self, GPSInfo):
         """Create a GPS object and emit values"""
@@ -436,5 +475,11 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         self.setMeasurementsCount()
 
+
         self.aggregatedValuesChanged.emit(self.measures)
         self.currentPositionChanged.emit(GPSInfo)
+
+        val = self.getProgress()
+        
+        if val >= 100:
+            self.cancelConnection(False)

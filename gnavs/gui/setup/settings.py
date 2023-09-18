@@ -5,6 +5,7 @@ import json
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QDialog, QListWidgetItem
 from qgis.PyQt.QtCore import QTimer
+from qgis.core import  QgsMessageLog
 
 from ...utils.utils import Utils
 
@@ -24,12 +25,13 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         QDialog.__init__(self, interface.mainWindow())
         self.setupUi(self)
 
+
         self.interface = interface
         self.connectionTimer = QTimer()
         self.connectionTimer.setSingleShot(True)
 
 
-        directory = Utils.getLayerDirectory('lfb-gnavs-aggregated')
+        directory = Utils.getLayerDirectory('GNAVS - Aggregated')
 
         self.lfbFileSelectionFileWidget.setFilePath(directory)
         self.lfbFileSelectionFileWidget.fileChanged.connect(self.directoryEntered)
@@ -145,7 +147,7 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
             directory = directory + '.gpkg'
             self.lfbFileSelectionFileWidget.setFilePath(directory)
         
-        Utils.saveLayerAsFile('lfb-gnavs-aggregated')
+        Utils.saveLayerAsFile('GNAVS - Aggregated')
 
     def aggregationChanged(self, item):
         """Save the aggregation type"""

@@ -12,6 +12,8 @@ from ..navigate.selection import Selection
 from ..measurement.aggregation import Aggregation
 from ..recording.focus import Focus
 
+from ..recording.indicator import Indicator
+
 
 UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'setup.ui'))
 
@@ -40,6 +42,9 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
         self.measurement = self.addMeasurement()
         self.selection = self.addNavigation()
 
+        # Temporary
+        #self.addIndicator()
+
         QgsProject.instance().layersAdded.connect( self.updateLayers ) # on toc change
         self.updateView()
 
@@ -48,8 +53,7 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
     def stopTracking(self):
         """Stop the GPS tracking"""
-
-        self.rec.cancelConnection()
+        self.rec.cancelConnection(True)
 
     #def stateChanged(self, state):
     #    self.state = state
@@ -69,6 +73,8 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
     def coordinatesChanged(self, gpsInfo):
         """Update target point distance and bearing"""
 
+        #self.indicator.setColor(gpsInfo)
+
         if self.toggleState == 'navigation' and self.selection is not None:
             self.selection.updateCoordinates(gpsInfo)
 
@@ -84,6 +90,7 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
         """Toggle between the navigation and point-recording view"""
 
         self.toggleState = toggleButtons
+        self.rec.toggleButtonsChanged(toggleButtons)
         self.updateView()
         
     def updateView(self):
@@ -98,6 +105,12 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
         # self.rec.toggleButtonsChanged(self.toggleState) - Deprecated
 
+    def recordingStateChanged(self, state):
+        """Update the recording state"""
+
+        if state == False:
+            self.selection.stopRecording()
+            #self.indicator.stop()
 
     def addRecording(self):
         """Add the GPS-recording view"""
@@ -105,6 +118,9 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
         rec = Recording(self.interface)
         rec.currentPositionChanged.connect(self.coordinatesChanged)
         rec.aggregatedValuesChanged.connect(self.aggregatedValuesChanged)
+
+        rec.recordingStateChanged.connect(self.recordingStateChanged)
+
         self.lfbSetup.addWidget(rec)
         return rec
     
@@ -137,5 +153,10 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
     
         self.stopTracking()
         self.measurement.emitData()
+
+    def addIndicator(self):
+        """Add the quality indicator"""
+        self.indicator = Indicator(self.interface)
+        self.lfbSetup.addWidget(self.indicator)
 
     

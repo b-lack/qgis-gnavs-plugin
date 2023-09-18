@@ -4,11 +4,11 @@
     <name>Form</name>
     <message>
         <source>PUNKTAUFNAHME</source>
-        <translation>Punktaufnahme</translation>
+        <translation>PUNKTAUFNAHME</translation>
     </message>
     <message>
         <source>SETTINGS</source>
-        <translation>EINSTELLUNGEN</translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <source>ADD TO MAP</source>

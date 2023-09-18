@@ -8,7 +8,7 @@
     </message>
     <message>
         <source>SETTINGS</source>
-        <translation>SETTINGS</translation>
+        <translation>Settings</translation>
     </message>
     <message>
         <source>ADD TO MAP</source>

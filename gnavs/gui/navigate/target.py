@@ -17,7 +17,7 @@ class Target(QtWidgets.QWidget, UI_CLASS):
     Sets up the target view, shows the selected target and updates distances and bearings.
     """
 
-    def __init__(self, interface, targetElement=None):
+    def __init__(self, interface, targetElement=None, onlyOne=False):
         """Constructor."""
 
         QDialog.__init__(self, interface.mainWindow())
@@ -31,6 +31,10 @@ class Target(QtWidgets.QWidget, UI_CLASS):
 
         self.updateValues()
         self.updateAttributeTableView()
+
+        if onlyOne:
+            self.lfbAttributeTableWidget.hide()
+            self.lfbTargetEdit_2.hide()
 
     def removeTargetSelection(self):
         """Deselect target"""

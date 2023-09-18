@@ -21,7 +21,7 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
     Sets up the selection view, shows selected features and updates distances and bearings.
     """
 
-    def __init__(self, interface, selectedFeature=None):
+    def __init__(self, interface, onlyOne=False):
         """Constructor."""
 
         QDialog.__init__(self, interface.mainWindow())
@@ -31,8 +31,16 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         self.gpsInfo = None
         self.targets = None
         self.interface = interface
+        self.onlyOne = onlyOne
+
 
         self.updateToC()
+
+    def stopRecording(self):
+        """Stop the GPS tracking"""
+        self.gpsInfo = None
+        Utils.clearLayer('lfb-tmp-distance', 'linestring')
+        self.layerSelectionChanged()
 
     def updateToC(self):
         """Update the Table of Contents"""
@@ -97,32 +105,34 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
 
         return targets
     
+    def removeAllTargets(self):
+
+        for i in reversed(range(self.lfbSelectedTargets.count())): 
+            widgetToRemove = self.lfbSelectedTargets.itemAt(i).widget()
+            # remove it from the layout list
+            self.lfbSelectedTargets.removeWidget(widgetToRemove)
+            # remove it from the gui
+            widgetToRemove.setParent(None)
+
     def updateSelectionTargets(self):
         """Update the list of targets selected by the user"""
 
-        while self.lfbSelectedTargets.count():
-            child = self.lfbSelectedTargets.takeAt(0)
-            if child.widget():
-                child.widget().deleteLater()
-
-
+        self.removeAllTargets()
         Utils.clearLayer('lfb-tmp-distance', 'linestring')
-        
-        if  self.targets is not None and len(self.targets) > 0:
+
+        if self.targets is not None and len(self.targets) > 0:
             for targetElement in self.targets:
-                target = Target(self.interface, targetElement)
+                target = Target(self.interface, targetElement, self.onlyOne)
                 self.lfbSelectedTargets.addWidget(target)
                 Utils.drawDistance('lfb-tmp-distance',targetElement['startPoint'], targetElement['endPoint'])
-                
         else:
             for element in self.selectedFeatures:
                 target = Target(self.interface, {
                     'id': element['feature'].id(),
                     'feature': element['feature'],
                     'layer': element['layer'],
-                })
+                }, self.onlyOne)
                 self.lfbSelectedTargets.addWidget(target)
-
         
 
     def updateSelectionLabel(self):
@@ -130,6 +140,8 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
 
         _translate = QtCore.QCoreApplication.translate
 
+        if self.onlyOne:
+            self.lfbSelectionGroup.setTitle('')
         if len(self.selectedFeatures) == 0:
             self.lfbSelectionGroup.setTitle(_translate("Form", "Keine Ziel ausgewählt"))
         if len(self.selectedFeatures) == 1:
