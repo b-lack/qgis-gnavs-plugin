@@ -45,7 +45,7 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="_2">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -98,7 +98,7 @@ border-bottom: 0px solid #888;</string>
            <x>0</x>
            <y>0</y>
            <width>654</width>
-           <height>514</height>
+           <height>518</height>
           </rect>
          </property>
          <layout class="QVBoxLayout">
@@ -153,21 +153,23 @@ border-bottom: 0px solid #888;</string>
           <number>5</number>
          </property>
          <item>
-          <widget class="QPushButton" name="lfbAddToMapBtn">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="cursor">
-            <cursorShape>PointingHandCursor</cursorShape>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton{
+          <layout class="QVBoxLayout" name="lfbAddToMapLayout">
+           <item>
+            <widget class="QPushButton" name="lfbAddToMapBtn">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="font">
+              <font>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QPushButton{
 	border: 2px solid #888;
 	color: #888;
 	padding: 5px;
@@ -181,11 +183,13 @@ QPushButton:enabled{
 	background-color: green;
 	color: #fff;
 }</string>
-           </property>
-           <property name="text">
-            <string>ADD TO MAP</string>
-           </property>
-          </widget>
+             </property>
+             <property name="text">
+              <string>ADD TO MAP</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>

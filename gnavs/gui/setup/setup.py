@@ -12,6 +12,10 @@ from ..navigate.selection import Selection
 from ..measurement.aggregation import Aggregation
 from ..recording.focus import Focus
 
+from qgis.core import QgsMessageLog
+
+from ..measurement.precision import PrecisionNote
+
 from ..recording.indicator import Indicator
 
 
@@ -38,6 +42,8 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
         self.rec = self.addRecording()
         self.followBtn = self.addFocus()
+
+        self.precisionNote = self.addPrecisionNote()
         
         self.measurement = self.addMeasurement()
         self.selection = self.addNavigation()
@@ -54,6 +60,7 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
     def stopTracking(self):
         """Stop the GPS tracking"""
         self.rec.cancelConnection(True)
+        
 
     #def stateChanged(self, state):
     #    self.state = state
@@ -75,8 +82,11 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
         #self.indicator.setColor(gpsInfo)
 
-        if self.toggleState == 'navigation' and self.selection is not None:
-            self.selection.updateCoordinates(gpsInfo)
+        #if self.toggleState == 'navigation' and self.selection is not None:
+        self.selection.updateCoordinates(gpsInfo, self.toggleState)
+
+        if self.toggleState == 'point':
+            self.precisionNote.updateIndicator(gpsInfo)
 
     def aggregatedValuesChanged(self, gpsInfos):
         """Update the aggregated values"""
@@ -84,7 +94,8 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
         self.measurementCountChanged.emit(len(gpsInfos))
 
         if self.toggleState == 'point' and len(gpsInfos) > 0:
-            self.measurement.updateAggregatedValues(gpsInfos)
+            aggregated = self.measurement.updateAggregatedValues(gpsInfos)
+            self.precisionNote.update(aggregated)
 
     def toggleButtonsChanged(self, toggleButtons):
         """Toggle between the navigation and point-recording view"""
@@ -99,9 +110,11 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
         if self.toggleState == 'navigation':
             self.selection.show()
             self.measurement.hide()
+            self.precisionNote.hide()
         else:
             self.selection.hide()
             self.measurement.show()
+            self.precisionNote.show()
 
         # self.rec.toggleButtonsChanged(self.toggleState) - Deprecated
 
@@ -110,6 +123,7 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
         if state == False:
             self.selection.stopRecording()
+            self.precisionNote.hideGroup()
             #self.indicator.stop()
 
     def addRecording(self):
@@ -123,6 +137,13 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbSetup.addWidget(rec)
         return rec
+    
+    def addPrecisionNote(self):
+        """Add the precision note view"""
+
+        precisionNote = PrecisionNote(self.interface)
+        self.lfbSetup.addWidget(precisionNote)
+        return precisionNote
     
     def addFocus(self):
         """Add the center map view"""

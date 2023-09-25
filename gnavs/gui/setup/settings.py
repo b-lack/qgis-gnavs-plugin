@@ -31,7 +31,7 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         self.connectionTimer.setSingleShot(True)
 
 
-        directory = Utils.getLayerDirectory('GNAVS - Aggregated')
+        directory = Utils.getLayerDirectory('GNAVS-Aggregated')
 
         self.lfbFileSelectionFileWidget.setFilePath(directory)
         self.lfbFileSelectionFileWidget.fileChanged.connect(self.directoryEntered)
@@ -147,7 +147,7 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
             directory = directory + '.gpkg'
             self.lfbFileSelectionFileWidget.setFilePath(directory)
         
-        Utils.saveLayerAsFile('GNAVS - Aggregated')
+        Utils.saveLayerAsFile('GNAVS-Aggregated')
 
     def aggregationChanged(self, item):
         """Save the aggregation type"""

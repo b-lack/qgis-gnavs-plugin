@@ -452,7 +452,7 @@ class Utils(object):
 
         layers = QgsProject.instance().mapLayers().values()
 
-        layerId1 = re.sub('[^a-zA-Z0-9 \n\.]', '', layerName)
+        layerId1 = re.sub(r'[^a-zA-Z0-9 \n\.]', '', layerName)
         layerId2 = layerName.replace('-', '_')
 
         for layer in layers:
@@ -469,7 +469,9 @@ class Utils(object):
         fields = Utils.getGPSInfoFields()
 
         if layer is None:
-            layer = Utils.getPrivateLayers(layerName, 'point', False, False, fields)
+            layerId1 = re.sub(r'[^a-zA-Z0-9 \n\.]', '', layerName).lower()
+            layer = Utils.getPrivateLayers(layerId1, 'point', False, False, fields)
+            layer.setName(layerName)
 
         if layer is None:
             return

@@ -8,6 +8,8 @@ from PyQt5 import QtCore
 
 from ...utils.utils import Utils
 
+from qgis.core import QgsMessageLog
+
 
 UI_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'target.ui'))
 
@@ -29,12 +31,17 @@ class Target(QtWidgets.QWidget, UI_CLASS):
         self.lfbTargetRemoveBtn.clicked.connect(self.removeTargetSelection)
         self.lfbTargetFokusBtn.clicked.connect(self.fokusToTarget)
 
-        self.updateValues()
+        self.updateValues(self.targetElement)
         self.updateAttributeTableView()
 
         if onlyOne:
             self.lfbAttributeTableWidget.hide()
             self.lfbTargetEdit_2.hide()
+
+    def getId(self):
+        """Get the id of the target"""
+
+        return self.targetElement['id']
 
     def removeTargetSelection(self):
         """Deselect target"""
@@ -80,19 +87,19 @@ class Target(QtWidgets.QWidget, UI_CLASS):
             item.setTextAlignment(QtCore.Qt.AlignCenter)
             self.lfbAttributeTableWidget.setItem(0 , i, item)
     
-    def updateValues(self):
+    def updateValues(self, targetElement):
         """Update the distance and bearing values"""
 
-        if 'distance' in self.targetElement:
+        if 'distance' in targetElement:
             #self.lfbTargetDetailsWidget.show()
-            if self.targetElement['distance'] > 1000:
-                self.lfbDistanceEdit.setText(str(round(self.targetElement['distance']/1000, 2)))
+            if targetElement['distance'] > 1000:
+                self.lfbDistanceEdit.setText(str(round(targetElement['distance']/1000, 2)))
                 self.lfbDistanceUnit.setText("km")
-            elif self.targetElement['distance'] > 1:
-                self.lfbDistanceEdit.setText(str(round(self.targetElement['distance'], 0)))
+            elif targetElement['distance'] > 1:
+                self.lfbDistanceEdit.setText(str(round(targetElement['distance'], 0)))
                 self.lfbDistanceUnit.setText("m")
             else:
-                self.lfbDistanceEdit.setText(str(round(self.targetElement['distance']*100, 0)))
+                self.lfbDistanceEdit.setText(str(round(targetElement['distance']*100, 0)))
                 self.lfbDistanceUnit.setText("cm")
         else:
             #self.lfbTargetDetailsWidget.hide()
@@ -107,10 +114,10 @@ class Target(QtWidgets.QWidget, UI_CLASS):
             self.lfbBearingUnit.setText("gon")
         else:
             self.lfbBearingUnit.setText("rad")
-        if 'bearing' in self.targetElement:
+        if 'bearing' in targetElement:
             degUnit = Utils.getSetting('degUnit', 'deg')
 
-            rad = self.targetElement['bearing']
+            rad = targetElement['bearing']
 
             deg = math.degrees(rad)
             deg = deg % 360

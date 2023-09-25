@@ -75,5 +75,10 @@
         <source>BEENDEN</source>
         <translation>STOP</translation>
     </message>
+
+    <message>
+        <source>qualityNoteBad</source>
+        <translation>Die Qualitätsparameter sind so schlecht, dass auf eine Messung verzichtet oder durch die Einmessung von mindestens drei Hilfspunkten mit Azimut und Distanz für eine anschließende Fehlerberrechnung und -ausgleichsrechnung erfolgen sollte.</translation>
+    </message>
 </context>
 </TS>

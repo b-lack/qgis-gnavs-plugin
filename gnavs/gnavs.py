@@ -25,6 +25,8 @@ from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
+from qgis.core import  QgsMessageLog
+
 # Initialize Qt resources from file resources.py
 #from .resources import *
 from . import resources
@@ -53,10 +55,16 @@ class Gnavs:
 
         # initialize locale
         locale = QSettings().value('locale/userLocale')[0:2]
+
+        # due to error message when installation from QGIS-Repo
+        loc = locale
+        if loc != 'de':
+            loc = 'en'
+
         locale_path = os.path.join(
             self.plugin_dir,
             'i18n',
-            'gnavs_{}.qm'.format(locale))
+            'gnavs_{}.qm'.format(loc))
         
         if os.path.exists(locale_path):
             self.translator = QTranslator()

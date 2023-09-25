@@ -85,6 +85,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.lfbValidIndicator.hide()
         self.lfbValidIndicator.setStyleSheet("background-color: gray; border-radius: 5px;")
 
+
+
         self.lfbRecordingPercent.setRange(0, 100)
         self.lfbRecordingPercent.setContentsMargins(0,0,0,0)
         self.lfbRecordingPercent.setValue(0)
@@ -315,12 +317,13 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
             if reset:
                 self.setMeasurementsCount()
-                self.getProgress()
 
             
 
         except Exception as e:
             pass
+
+        self.getProgress()
 
     def connection_succeed(self, connection, closeConnection=False):
         """Connection succeed to the GPS device"""
@@ -436,8 +439,11 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         val = round(len(self.measures) / int(meassurementSetting) * 100)
 
+        
         self.lfbRecordingPercent.setValue(val)
-        self.lfbRecordingPercent.show()
+
+        if self.recordingStyle != 'navigation':
+            self.lfbRecordingPercent.show()
 
         return val
         
@@ -456,6 +462,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.lfbGPSCountSeperator.show()
             self.lfbGPSCount.show()
             self.label_2.show()
+            self.lfbRecordingPercent.show()
 
     def createGPSObject(self, GPSInfo):
         """Create a GPS object and emit values"""
@@ -475,11 +482,15 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         self.setMeasurementsCount()
 
+        
+        self.currentPositionChanged.emit(GPSInfo)
+
+        if self.recordingStyle == 'navigation':
+            return
 
         self.aggregatedValuesChanged.emit(self.measures)
-        self.currentPositionChanged.emit(GPSInfo)
 
         val = self.getProgress()
         
-        if val >= 100:
+        if val >= 100 and self.recordingStyle != 'navigation':
             self.cancelConnection(False)

@@ -30,6 +30,12 @@ class Indicator(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbIndicatorFrame.setFixedSize(width, height)
 
+        self.lfbHelpBtn.clicked.connect(self.getHelp)
+
+
+    def getHelp(self):
+        QgsMessageLog.logMessage('Help', 'gnavs')
+
     def stop(self, size):
         """Sets the size of the widget"""
 
@@ -41,8 +47,22 @@ class Indicator(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbIndicatorFrame.setStyleSheet("background-color: " + color + ";")
 
+        return color
 
-        pass
+    def getAggregatedNote(self, gpsInfos):
+        """Show a note about the aggregated precision of the measurement"""
+        
+        longitudeStDev = gpsInfos['longitudeStDev']
+        latitudeStDev = gpsInfos['latitudeStDev']
+
+        
+        if gpsInfos is None or gpsInfos['pdop'] is None or gpsInfos['satellitesUsed'] is None:
+            return True
+        elif gpsInfos['pdop'] > 6 or gpsInfos['satellitesUsed'] < 6 or longitudeStDev > 0.00002 or latitudeStDev > 0.00002:
+            return True
+
+        return False
+        
     def getColor(self, gpsInfo):
         """Returns the color of the indicator"""
 
@@ -52,7 +72,7 @@ class Indicator(QtWidgets.QWidget, UI_CLASS):
             return 'green'
         elif str(gpsInfo.qualityIndicator) == 'GpsQualityIndicator.FloatRTK' and gpsInfo.pdop < 6 and gpsInfo.satellitesUsed >= 6:
             return 'yellow'
-        elif str(gpsInfo.qualityIndicator) == 'GpsQualityIndicator.GPS' and gpsInfo.pdop < 6 and gpsInfo.satellitesUsed >= 6:
+        elif str(gpsInfo.qualityIndicator) == 'GpsQualityIndicator.GPS' and gpsInfo.pdop < 10 and gpsInfo.satellitesUsed >= 6:
             return 'orange'
         else:
             return 'red'

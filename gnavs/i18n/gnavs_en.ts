@@ -130,5 +130,10 @@
         <source>BEENDEN</source>
         <translation>STOP</translation>
     </message>
+
+    <message>
+        <source>qualityNoteBad</source>
+        <translation>The quality parameters are so poor that a measurement should be omitted or should be made by measuring at least three auxiliary points with azimuth and distance for a subsequent error calculation and compensation.</translation>
+    </message>
 </context>
 </TS>

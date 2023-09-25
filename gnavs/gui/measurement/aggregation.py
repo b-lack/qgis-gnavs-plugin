@@ -40,7 +40,7 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         self.getTextFields()
         self.lfbAddToMapBtn.setEnabled(False)
 
-        Utils.addPointToLayer('GNAVS - Aggregated', self.aggregatedValues, self.gpsInfos)
+        Utils.addPointToLayer('GNAVS-Aggregated', self.aggregatedValues, self.gpsInfos)
         self.reset()
 
     def updateAggregatedValues(self, gpsInfos):

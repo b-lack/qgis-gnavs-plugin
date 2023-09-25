@@ -59,7 +59,7 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         self.layerSelectionChanged()
 
 
-    def updateCoordinates(self, gpsInfo):
+    def updateCoordinates(self, gpsInfo, trackingState = 'navigation'):
         """Update the GPS coordinates and list of targets selected by the user"""
 
         if gpsInfo is None or gpsInfo.latitude is None or gpsInfo.longitude is None:
@@ -73,7 +73,10 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         Utils.clearLayer('lfb-tmp-position', 'point')
         Utils.drawPosition('lfb-tmp-position', position)
 
-        self.updateSelectionTargets()
+        if trackingState == 'navigation':
+            self.updateSelectionTargets()
+        else:
+            Utils.clearLayer('lfb-tmp-distance', 'linestring')
 
     def createTargetList(self):
         """Create a list of targets selected by the user"""
@@ -117,22 +120,46 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
     def updateSelectionTargets(self):
         """Update the list of targets selected by the user"""
 
-        self.removeAllTargets()
+        #self.removeAllTargets()
         Utils.clearLayer('lfb-tmp-distance', 'linestring')
 
-        if self.targets is not None and len(self.targets) > 0:
-            for targetElement in self.targets:
+        newTargets = self.targets
+        for i in reversed(range(self.lfbSelectedTargets.count())): # existing Targets
+            exists = None
+            target = self.lfbSelectedTargets.itemAt(i).widget()
+
+            for targetElement in newTargets: # new Targets
+                if target.getId() == targetElement['id']:
+                    exists = target
+                    target.updateValues(targetElement)
+                    newTargets.remove(targetElement)
+                    Utils.drawDistance('lfb-tmp-distance',targetElement['startPoint'], targetElement['endPoint'])
+                    break
+            
+            if exists is None:
+                # remove it from the layout list
+                self.lfbSelectedTargets.removeWidget(target)
+                # remove it from the gui
+                target.setParent(None)
+            else:
+                Utils.drawDistance('lfb-tmp-distance',targetElement['startPoint'], targetElement['endPoint'])
+
+
+        if newTargets is not None and len(newTargets) > 0:
+
+            for targetElement in newTargets:
+
                 target = Target(self.interface, targetElement, self.onlyOne)
                 self.lfbSelectedTargets.addWidget(target)
                 Utils.drawDistance('lfb-tmp-distance',targetElement['startPoint'], targetElement['endPoint'])
-        else:
-            for element in self.selectedFeatures:
-                target = Target(self.interface, {
-                    'id': element['feature'].id(),
-                    'feature': element['feature'],
-                    'layer': element['layer'],
-                }, self.onlyOne)
-                self.lfbSelectedTargets.addWidget(target)
+        #else:
+        #    for element in self.selectedFeatures:
+        #        target = Target(self.interface, {
+        #            'id': element['feature'].id(),
+        #            'feature': element['feature'],
+        #            'layer': element['layer'],
+        #        }, self.onlyOne)
+        #        self.lfbSelectedTargets.addWidget(target)
         
 
     def updateSelectionLabel(self):

@@ -33,6 +33,7 @@ from .setup.setup import Setup
 from .setup.settings import Settings
 from ..utils.utils import Utils
 from .recording.toggle_buttons import ToggleButtons
+from qgis.core import  QgsMessageLog
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(os.path.dirname(__file__), 'gnavs_dockwidget_base.ui'))
 
@@ -73,6 +74,9 @@ class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
         self.toHome()
         self.toggleButtonsChanged('navigation')
+
+        filePath = Utils.getSettingsDirectory() # Create the settings directory if it does not exist
+        QgsMessageLog.logMessage(filePath, 'gnavs')
 
     def addToMap(self):
         """Add the recorded points to the map"""

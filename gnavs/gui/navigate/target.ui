@@ -130,7 +130,7 @@ background-color:#ddd;</string>
         </property>
         <layout class="QHBoxLayout" name="lfbTargetDetails">
          <property name="leftMargin">
-          <number>0</number>
+          <number>10</number>
          </property>
          <property name="topMargin">
           <number>10</number>
@@ -143,6 +143,9 @@ background-color:#ddd;</string>
          </property>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_2">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -224,6 +227,9 @@ background-color:#ddd;</string>
          </item>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -317,6 +323,9 @@ background-color:#ddd;</string>
              <pointsize>8</pointsize>
             </font>
            </property>
+           <property name="cursor">
+            <cursorShape>PointingHandCursor</cursorShape>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: transparent;
 color: red;
@@ -354,6 +363,9 @@ border: none;</string>
            </property>
            <property name="cursor">
             <cursorShape>PointingHandCursor</cursorShape>
+           </property>
+           <property name="mouseTracking">
+            <bool>false</bool>
            </property>
            <property name="styleSheet">
             <string notr="true">QPushButton{
