@@ -53,7 +53,7 @@
         <bool>true</bool>
        </property>
        <property name="storageMode">
-        <enum>QgsFileWidget::SaveFile</enum>
+        <enum>QgsFileWidget::GetDirectory</enum>
        </property>
       </widget>
      </item>

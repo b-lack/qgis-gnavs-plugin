@@ -283,8 +283,11 @@ class Utils(object):
         pathToBeSet = Utils.getSetting('directory')
         layer = Utils.getLayerById(layerName)
 
-        if layer is None or pathToBeSet is None:
+        if layer is None:
             return None
+        elif pathToBeSet is None:
+            return None
+        
         
         writer = QgsVectorFileWriter.writeAsVectorFormatV3(layer, pathToBeSet, QgsCoordinateTransformContext(), QgsVectorFileWriter.SaveVectorOptions())
         if writer[0] == QgsVectorFileWriter.NoError:
@@ -452,8 +455,8 @@ class Utils(object):
 
         layers = QgsProject.instance().mapLayers().values()
 
-        layerId1 = re.sub(r'[^a-zA-Z0-9 \n\.]', '', layerName)
-        layerId2 = layerName.replace('-', '_')
+        layerId1 = re.sub(r'[^a-zA-Z0-9 \n\.]', '', layerName).lower()
+        layerId2 = layerName.replace('-', '_').lower()
 
         for layer in layers:
             if layer.id().startswith(layerId1) or layer.id().startswith(layerId2) :

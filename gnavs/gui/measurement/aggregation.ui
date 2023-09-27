@@ -28,8 +28,14 @@
    </property>
    <item>
     <widget class="QgsCollapsibleGroupBox" name="mGroupBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="title">
       <string>Details</string>
+     </property>
+     <property name="collapsed">
+      <bool>false</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="leftMargin">
@@ -76,125 +82,139 @@
          </widget>
         </item>
         <item row="1" column="0">
+         <widget class="QLabel" name="label_11">
+          <property name="text">
+           <string>Invalid</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
          <widget class="QLabel" name="label_5">
           <property name="text">
            <string>Longitude</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="2" column="1">
          <widget class="QLabel" name="lfbGPSLon">
           <property name="text">
            <string>0</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="label_10">
           <property name="text">
            <string>Latitude</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="3" column="1">
          <widget class="QLabel" name="lfbGPSLat">
           <property name="text">
            <string>0</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="label_6">
           <property name="text">
            <string>Satelite Count</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="4" column="1">
          <widget class="QLabel" name="lfbGPSsatCount">
           <property name="text">
            <string>0</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="5" column="0">
          <widget class="QLabel" name="label_7">
           <property name="text">
            <string>VDOP</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="5" column="1">
          <widget class="QLabel" name="lfbGPSvDop">
           <property name="text">
            <string>0</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="6" column="0">
          <widget class="QLabel" name="label_8">
           <property name="text">
            <string>HDOP</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
+        <item row="6" column="1">
          <widget class="QLabel" name="lfbGPShDop">
           <property name="text">
            <string>0</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
+        <item row="7" column="0">
          <widget class="QLabel" name="label_9">
           <property name="text">
            <string>PDOP</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
+        <item row="7" column="1">
          <widget class="QLabel" name="lfbGPSpDop">
           <property name="text">
            <string>0</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="0">
+        <item row="8" column="0">
          <widget class="Line" name="line">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
-        <item row="8" column="0">
+        <item row="9" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>GPS-Gerät</string>
           </property>
          </widget>
         </item>
-        <item row="8" column="1">
+        <item row="9" column="1">
          <widget class="QLineEdit" name="lfbGPSDevice"/>
         </item>
-        <item row="9" column="0">
+        <item row="10" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
            <string>Punktname / ID</string>
           </property>
          </widget>
         </item>
-        <item row="9" column="1">
+        <item row="10" column="1">
          <widget class="QLineEdit" name="lfbGPSName"/>
         </item>
-        <item row="10" column="0">
+        <item row="11" column="0">
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>Bemerkung</string>
           </property>
          </widget>
         </item>
-        <item row="10" column="1">
+        <item row="11" column="1">
          <widget class="QPlainTextEdit" name="lfbGPSDescription"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLabel" name="lfbGPSInvalid">
+          <property name="text">
+           <string>0</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

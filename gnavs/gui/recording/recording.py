@@ -2,6 +2,7 @@
 import os
 import json
 import random
+import math
 
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QDialog
@@ -469,6 +470,15 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
     def createGPSObject(self, GPSInfo):
         """Create a GPS object and emit values"""
 
+        isInvalid = False
+        
+        if GPSInfo.latitude == 0 and GPSInfo.longitude == 0:
+            isInvalid = True
+        elif GPSInfo.latitude is None or GPSInfo.longitude is None or GPSInfo.elevation is None or GPSInfo.vdop is None or GPSInfo.pdop is None or GPSInfo.hdop is None or GPSInfo.satellitesUsed is None or GPSInfo.quality is None or GPSInfo.qualityIndicator is None:
+            isInvalid = True
+        elif math.isnan(GPSInfo.latitude) or math.isnan(GPSInfo.longitude) or math.isnan(GPSInfo.elevation) or math.isnan(GPSInfo.vdop) or math.isnan(GPSInfo.pdop) or math.isnan(GPSInfo.hdop) or math.isnan(GPSInfo.satellitesUsed) or math.isnan(GPSInfo.quality) or math.isnan(GPSInfo.qualityIndicator):
+            isInvalid = True
+
         self.measures.insert(0, {
             'utcDateTime': GPSInfo.utcDateTime.currentMSecsSinceEpoch(),
             'latitude': GPSInfo.latitude,
@@ -479,8 +489,10 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             'hdop': GPSInfo.hdop,
             'satellitesUsed': GPSInfo.satellitesUsed,
             'quality': GPSInfo.quality,
-            'qualityIndicator': random.randint(0,10) #TODO: self.getQualityColor(GPSInfo),
+            'qualityIndicator': random.randint(0,10), #TODO: self.getQualityColor(GPSInfo),
+            'invalid': isInvalid
         })
+
 
         self.setMeasurementsCount()
 

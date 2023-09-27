@@ -1,6 +1,8 @@
 
 import os
 import json
+from datetime import datetime
+
 
 from qgis.PyQt import QtWidgets, uic
 from qgis.PyQt.QtWidgets import QDialog, QListWidgetItem
@@ -144,9 +146,13 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
             return
         
         if not directory.endswith('.gpkg'):
-            directory = directory + '.gpkg'
+            dateTimeName = datetime.now().strftime("%Y_%m_%d-%H_%M")
+
+            fileName = directory + '/gnavs-aggregated_' + dateTimeName + '.gpkg'
+            
             self.lfbFileSelectionFileWidget.setFilePath(directory)
-        
+            Utils.setSetting('directory', fileName)
+
         Utils.saveLayerAsFile('GNAVS-Aggregated')
 
     def aggregationChanged(self, item):
@@ -171,6 +177,7 @@ class Settings(QtWidgets.QWidget, UI_CLASS):
         """Save the best meassurement percentage"""
 
         saveValue = self.bestMeassurements[item]['value']
+
         Utils.setSetting('bestMeassurementSetting', saveValue)
 
     def checkButtons(self):

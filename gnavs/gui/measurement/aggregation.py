@@ -72,53 +72,60 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
             return statistics.median(list)
         else:
             return statistics.mean(list)
-        
+    
+    def getDefaultAggregationValues(self):
+        return {
+            'measurementsCount': 0,
+            'measurementsUsedCount': 0,
+            'aggregationType': '',
+            'latitude': 0,
+            'latitudeStDev': 0,
+            'longitude': 0,
+            'longitudeStDev': 0,
+            'elevation': 0,
+            'elevationStDev': 0,
+            'vdop': 0,
+            'vdopStDev': 0,
+            'pdop': 0,
+            'pdopStDev': 0,
+            'hdop': 0,
+            'hdopStDev': 0,
+            'satellitesUsed': 0,
+            'satellitesUsedStDev': 0,
+
+            'name': '',
+            'description': '',
+            'device': '',
+
+            'invalid': 0
+        }
+    
     def reset(self):
         """Resets the aggregation view"""
 
         self.aggregatedValues = []
-        self.printAggregatedValues(
-            {
-                'measurementsCount': 0,
-                'measurementsUsedCount': 0,
-                'aggregationType': '',
-                'latitude': 0,
-                'latitudeStDev': 0,
-                'longitude': 0,
-                'longitudeStDev': 0,
-                'elevation': 0,
-                'elevationStDev': 0,
-                'vdop': 0,
-                'vdopStDev': 0,
-                'pdop': 0,
-                'pdopStDev': 0,
-                'hdop': 0,
-                'hdopStDev': 0,
-                'satellitesUsed': 0,
-                'satellitesUsedStDev': 0,
-
-                'name': '',
-                'description': '',
-                'device': '',
-            }, True
-        )
+        self.printAggregatedValues(self.getDefaultAggregationValues(), True)
 
     def aggregate(self, GPSInfos):
         """Aggregates the GPSInfos"""
 
         if self.settings == None:
             self.refreshSettings()
-        
+
+        ## filter valid Data
+        validGPSInfos = [d for d in GPSInfos if d['invalid'] == False]
+
         if self.settings['sortingValues']:
             for sortObj in reversed(self.settings['sortingValues']):
                 if 'active' in sortObj and sortObj['active']:
-                    GPSInfos.sort(key=lambda x: x[sortObj['value']], reverse=sortObj['direction'])
+                    validGPSInfos.sort(key=lambda x: x[sortObj['value']], reverse=sortObj['direction'])
 
 
         measurementLength = len(GPSInfos)
-        besteMeasurements = round(measurementLength * int(self.settings['bestMeassurementSetting']) / 100)
+        validMeasurementLength = len(validGPSInfos)
+        besteMeasurements = round(validMeasurementLength * int(self.settings['bestMeassurementSetting']) / 100)
 
-        listBestMeasurements = GPSInfos[:besteMeasurements]
+        listBestMeasurements = validGPSInfos[:besteMeasurements]
         aggregationType = self.settings['aggregationType']
 
         latitude = [d['latitude'] for d in listBestMeasurements]
@@ -131,13 +138,14 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
 
         measurementDateTime = [d['utcDateTime'] for d in listBestMeasurements]
 
-        if elevation is None:
-            elevation = [0]
-            QgsMessageLog.logMessage(str(elevation), 'gnavs')
+        if len(measurementDateTime) == 0:
+            return self.getDefaultAggregationValues()
 
         return {
             'measurementStartTime': min(measurementDateTime),
             'measurementEndTime': max(measurementDateTime),
+
+            'invalid': len(GPSInfos) - len(validGPSInfos),
 
             'measurementsCount': measurementLength,
             'measurementsUsedCount': besteMeasurements,
@@ -179,6 +187,7 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
         self.lfbGPSCountBest.setText( str(aggregatedValues['measurementsUsedCount']) )
         self.lfbGPSLat.setText( str(round(aggregatedValues['latitude'], 8)) ) # 1.11 mm
         self.lfbGPSLon.setText( str(round(aggregatedValues['longitude'], 8)) ) # 1.11 mm
+        self.lfbGPSInvalid.setText( str(aggregatedValues['invalid']) )
         self.lfbGPSsatCount.setText( str(round(aggregatedValues['satellitesUsed'])) )
 
         self.lfbGPSpDop.setText( str(round(aggregatedValues['pdop'], 2)) )

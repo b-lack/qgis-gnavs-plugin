@@ -116,6 +116,8 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
             self.measurement.show()
             self.precisionNote.show()
 
+        self.measurement.refreshSettings()
+        self.rec.refreshSettings()
         # self.rec.toggleButtonsChanged(self.toggleState) - Deprecated
 
     def recordingStateChanged(self, state):
