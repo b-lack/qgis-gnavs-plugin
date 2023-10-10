@@ -11,7 +11,7 @@
         <download_url>https://github.com/b-lack/qgis-gnavs-plugin/releases/download/v1.0.7/gnavs.zip</download_url>
         <uploaded_by>Grünecho</uploaded_by>
         <create_date>2023-07-30</create_date>
-        <update_date>2023-08-30</update_date>
+        <update_date>2023-10-10</update_date>
         <experimental>False</experimental>
         <deprecated>False</deprecated>
         <tracker>https://github.com/b-lack/qgis-gnavs-plugin/issues</tracker>
