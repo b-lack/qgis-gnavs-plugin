@@ -141,7 +141,16 @@ class Utils(object):
     def focusToXY(x, y, zoom = 150000):
         """Center map to a coordinate."""
 
-        iface.mapCanvas().setCenter(QgsPointXY(x, y))
+
+        crs = QgsProject.instance().crs().authid()
+
+        map_pos = QgsPointXY(x, y)
+        src_crs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
+        dest_crs = QgsCoordinateReferenceSystem(crs)
+        xform = QgsCoordinateTransform(src_crs, dest_crs, QgsProject().instance())
+        map_pos = xform.transform(map_pos)
+        iface.mapCanvas().setCenter(map_pos)
+        
 
     def transformCoordinates(geom):
         """Transform coordinates from WGS84 to the current project CRS."""
