@@ -33,13 +33,9 @@ See the plugin [in action](https://www.youtube.com/watch?v=PlruoQ83FbE).
 
 ## Installation from official QGIS-Repository
 
-1. QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``Settings``
+1. QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``ALL``
 
-2. Check: "Allow experimental plugins"
-
-3. QGIS: ``Plugins`` -> ``Manage and Install Plugins...`` -> ``ALL``
-
-4. Search for `GNAVS` and select `Install Plugin`
+2. Search for `GNAVS` and select `Install Plugin`
 
 
 ## Installation from GitHub-Repository
