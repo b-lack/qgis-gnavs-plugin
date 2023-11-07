@@ -2,16 +2,16 @@
 <plugins>
     <pyqgis_plugin name="GNAVS - GNSS Navigate and Save" version="1.0.7">
         <description><![CDATA[GNAVS - GNSS Navigate and Save]]></description>
-        <version>1.0.8</version>
+        <version>1.0.9</version>
         <qgis_minimum_version>3.22</qgis_minimum_version>
         <homepage>https://github.com/b-lack/qgis-gnavs-plugin</homepage>
         <file_name>gnavs.zip</file_name>
         <icon>gnavs/icon.png</icon>
         <author_name>Torsten Wiebke (Concept), Gerrit Balindt (Development)</author_name>
-        <download_url>https://github.com/b-lack/qgis-gnavs-plugin/releases/download/v1.0.8/gnavs.zip</download_url>
+        <download_url>https://github.com/b-lack/qgis-gnavs-plugin/releases/download/v1.0.9/gnavs.zip</download_url>
         <uploaded_by>Grünecho</uploaded_by>
         <create_date>2023-07-30</create_date>
-        <update_date>2023-10-10</update_date>
+        <update_date>2023-11-07</update_date>
         <experimental>False</experimental>
         <deprecated>False</deprecated>
         <tracker>https://github.com/b-lack/qgis-gnavs-plugin/issues</tracker>
