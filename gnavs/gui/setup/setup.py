@@ -103,6 +103,23 @@ class Setup(QtWidgets.QWidget, UI_CLASS):
         self.toggleState = toggleButtons
         self.rec.toggleButtonsChanged(toggleButtons)
         self.updateView()
+
+    def default_fim_settings(self):
+        """Set default QGIS settings""" # Temporary for FIM injection testing
+
+        return {
+            "meassurementSetting": 100,
+            "bestMeassurementSetting": 70,
+            "aggregationType": 'mean',
+            "sortingValues": [
+                {"name": "Quality", "value": "qualityIndicator", "direction": True, "active": True},
+
+                {"name": "PDOP", "value": "pdop", "direction": True, "active": True},
+                {"name": "HDOP", "value": "hdop", "direction": True, "active": True},
+                
+                {"name": "Satellites Used", "value": "satellitesUsed", "direction": False, "active": True}
+            ],
+        }
         
     def updateView(self):
         """Toggle between the navigation and point-recording view"""

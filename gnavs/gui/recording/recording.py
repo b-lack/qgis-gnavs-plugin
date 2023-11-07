@@ -27,13 +27,17 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
     currentPositionChanged = QtCore.pyqtSignal(object)
     recordingStateChanged = QtCore.pyqtSignal(bool)
 
-    def __init__(self, interface, aggregate=True):
+    def __init__(self, interface, aggregate=True, settings=None):
         """Constructor."""
 
         QDialog.__init__(self, interface.mainWindow())
         self.setupUi(self)
 
-        self.refreshSettings()
+        if settings is None:
+            self.refreshSettings()
+        else:
+            self.settings = settings
+        
         self.interface = interface
 
         self.measures = []
@@ -121,14 +125,18 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 #            self.lfbGetCoordinatesGtn.setText("AUFZEICHNEN")
 #            self.lfbCancelCoordinatesBtn.setText("BEENDEN")
 
-    def refreshSettings(self):
+    def refreshSettings(self, settings=None):
         """Set default QGIS settings"""
-        self.settings = {
-            "meassurementSetting": Utils.getSetting('meassurementSetting', 100),
-            "bestMeassurementSetting": Utils.getSetting('bestMeassurementSetting', 70),
-            "aggregationType": Utils.getSetting('aggregationType', 'mean'),
-            "sortingValues": json.loads(Utils.getSetting('sortingValues', '[]')),
-        }
+
+        if settings is None:
+            self.settings = {
+                "meassurementSetting": Utils.getSetting('meassurementSetting', 100),
+                "bestMeassurementSetting": Utils.getSetting('bestMeassurementSetting', 70),
+                "aggregationType": Utils.getSetting('aggregationType', 'mean'),
+                "sortingValues": json.loads(Utils.getSetting('sortingValues', '[]')),
+            }
+        else:
+            self.settings = settings
     
     def updateSerialPortSelection(self):
         """Update the serial port List"""
@@ -436,7 +444,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
            self.geConnectionInfoLabel.setText(str(e))
 
     def getProgress(self):
-        meassurementSetting = Utils.getSetting('meassurementSetting', 100)
+        QgsMessageLog.logMessage(str(self.settings['meassurementSetting']), 'LFB')
+        meassurementSetting = self.settings['meassurementSetting'] #Utils.getSetting('meassurementSetting', 100)
         self.lfbGPSCountSeperator.setText('/')
         self.lfbGPSCountTotal.setText(str(meassurementSetting))
 

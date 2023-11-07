@@ -23,13 +23,13 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
 
     addToMap = QtCore.pyqtSignal(object, list)
 
-    def __init__(self, interface):
+    def __init__(self, interface, settings=None):
         """Constructor."""
 
         QDialog.__init__(self, interface.mainWindow())
         self.setupUi(self)
 
-        self.settings = None
+        self.settings = settings
 
         self.lfbAddToMapBtn.setEnabled(False)
 
@@ -55,15 +55,18 @@ class Aggregation(QtWidgets.QWidget, UI_CLASS):
 
         return self.aggregatedValues
 
-    def refreshSettings(self):
-        """Gets all relevant settings for aggregation"""
+    def refreshSettings(self, settings=None):
+        """Set default QGIS settings"""
 
-        self.settings = {
-            "meassurementSetting": Utils.getSetting('meassurementSetting', 100),
-            "bestMeassurementSetting": Utils.getSetting('bestMeassurementSetting', 70),
-            "aggregationType": Utils.getSetting('aggregationType', 'mean'),
-            "sortingValues": json.loads(Utils.getSetting('sortingValues', '[]')),
-        }
+        if settings is None:
+            self.settings = {
+                "meassurementSetting": Utils.getSetting('meassurementSetting', 100),
+                "bestMeassurementSetting": Utils.getSetting('bestMeassurementSetting', 70),
+                "aggregationType": Utils.getSetting('aggregationType', 'mean'),
+                "sortingValues": json.loads(Utils.getSetting('sortingValues', '[]')),
+            }
+        else:
+            self.settings = settings
 
     def middlePoint(self, list, aggregationType='mean'):
         """Calculates mean or median of values in list"""
