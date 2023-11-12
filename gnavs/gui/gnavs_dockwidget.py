@@ -75,10 +75,6 @@ class GnavsDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.toHome()
         self.toggleButtonsChanged('navigation')
 
-        # Get the settings directory
-        #filePath = Utils.getSettingsDirectory()
-        #QgsMessageLog.logMessage(filePath, 'gnavs')
-
     def addToMap(self):
         """Add the recorded points to the map"""
 

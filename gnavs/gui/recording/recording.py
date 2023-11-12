@@ -372,6 +372,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
             connectionRegistry = QgsApplication.gpsConnectionRegistry()
             connectionRegistry.registerConnection(self.gpsCon)
+            
         except Exception as e:
             QgsMessageLog.logMessage('Exception:' + str(e))
 
@@ -444,7 +445,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
            self.geConnectionInfoLabel.setText(str(e))
 
     def getProgress(self):
-        QgsMessageLog.logMessage(str(self.settings['meassurementSetting']), 'LFB')
         meassurementSetting = self.settings['meassurementSetting'] #Utils.getSetting('meassurementSetting', 100)
         self.lfbGPSCountSeperator.setText('/')
         self.lfbGPSCountTotal.setText(str(meassurementSetting))
