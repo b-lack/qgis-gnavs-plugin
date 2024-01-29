@@ -332,6 +332,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             
 
         except Exception as e:
+            QgsMessageLog.logMessage('Exception:' + str(e), 'LFB')
             pass
 
         self.getProgress()
@@ -354,7 +355,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         elif isinstance(connection, QgsGpsConnection):
             self.gpsCon = connection
         else:
-            QgsMessageLog.logMessage("not isinstance: " + str(connection), 'LFB')   
+            QgsMessageLog.logMessage("not isinstance: " + str(connection), 'GNAVS')   
             return
         
         if closeConnection:
@@ -374,7 +375,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             connectionRegistry.registerConnection(self.gpsCon)
             
         except Exception as e:
-            QgsMessageLog.logMessage('Exception:' + str(e))
+            QgsMessageLog.logMessage('Exception:' + str(e), 'GNAVS')
 
     def connection_failed(self):
         """Connection to the GPS device failed"""
@@ -421,28 +422,31 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             
 
     def status_changed(self, gpsInfo):
-        
         """Update the GPS position and emit values"""
-        quality = gpsInfo.quality
+
+        if self.filter_double_coordinates(gpsInfo):
+                return        
 
         try:
-            if quality == 0:
+
+            
+            if gpsInfo.quality == 0:
                 self.lfbValidIndicator.setStyleSheet("background-color: red; border-radius: 5px;")
                 return
-            elif quality == -1:
+            elif gpsInfo.quality == -1:
                 self.lfbValidIndicator.setStyleSheet("background-color: yellow; border-radius: 5px;")
             else:
                 self.lfbValidIndicator.setStyleSheet("background-color: green; border-radius: 5px;")
-
-            self.lastGPSInfo = gpsInfo
             
-
+            self.lastGPSInfo = gpsInfo
+           
             if self.keepFocus:
                 self.setFocus()
                 
             self.createGPSObject(gpsInfo)
         except Exception as e:
-           self.geConnectionInfoLabel.setText(str(e))
+            QgsMessageLog.logMessage('Exception:' + str(e), 'GNAVS')
+            self.geConnectionInfoLabel.setText(str(e))
 
     def getProgress(self):
         meassurementSetting = self.settings['meassurementSetting'] #Utils.getSetting('meassurementSetting', 100)
@@ -451,7 +455,6 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         val = round(len(self.measures) / int(meassurementSetting) * 100)
 
-        
         self.lfbRecordingPercent.setValue(val)
 
         if self.recordingStyle != 'navigation':
@@ -476,6 +479,18 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.label_2.show()
             self.lfbRecordingPercent.show()
 
+
+    def filter_double_coordinates(self, gpsInfo):
+        """Filter double coordinates"""
+
+        if self.lastGPSInfo is None:
+            return False
+
+        if gpsInfo.longitude == self.lastGPSInfo.longitude and gpsInfo.latitude == self.lastGPSInfo.latitude:
+            return True
+
+        return False
+    
     def createGPSObject(self, GPSInfo):
         """Create a GPS object and emit values"""
 
