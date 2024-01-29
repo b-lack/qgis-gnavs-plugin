@@ -27,9 +27,7 @@
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <property name="styleSheet">
-    <string notr="true">QScrollArea#lfbScrollArea{
-
-}</string>
+    <string notr="true"></string>
    </property>
    <layout class="QGridLayout" name="gridLayout">
     <property name="leftMargin">

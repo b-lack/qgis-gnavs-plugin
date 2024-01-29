@@ -4,7 +4,7 @@
 
 [general]
 name=GNAVS
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.22
 description=GNSS Navigate and Save
 version=1.0.9
 author=Torsten Wiebke (Concept), Gerrit Balindt (Development)
