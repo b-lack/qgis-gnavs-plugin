@@ -73,6 +73,9 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.lfbCancelCoordinatesBtn.setEnabled(False)
         self.lfbCancelCoordinatesBtn.hide()
 
+        self.lfbServerPort.hide()
+        self.lfbServerPort.textChanged.connect(self.onServerPortChanged)
+
 
         self.updateSerialPortSelection()
         self.lfbRefreshSerialListBtn.clicked.connect(self.updateSerialPortSelection)
@@ -144,7 +147,11 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         self.lfbSerialPortList.clear()
         for port in self.ports:
-            self.lfbSerialPortList.addItem(port[0], port[0])
+
+            if port[0].startswith('localhost') :
+                self.lfbSerialPortList.addItem('localhost', port[0])
+            else:
+                self.lfbSerialPortList.addItem(port[0], port[0])
 
     def selectPort(self, port):
         """Select a serial port"""
@@ -155,6 +162,10 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.lfbSerialPortList.setCurrentIndex(0)
 
         self.onSerialPortChanged(self.lfbSerialPortList.currentIndex())
+
+    def onServerPortChanged(self, value):
+        """Update the server port"""
+        self.server_port = value
 
     def getGPSSettings(self):
         """Get the selected and saved serial port from Settings"""
@@ -171,6 +182,11 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             return
         
         self.port = self.lfbSerialPortList.itemData(index)
+
+        if self.port.startswith('localhost'):
+            self.lfbServerPort.show()
+        else:
+            self.lfbServerPort.hide()
     
     def connectionEstablished(self):
         """Check if a connection already exists and return it"""
@@ -287,7 +303,11 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         self.lfbCancelCoordinatesBtn.show()
         self.lfbCancelCoordinatesBtn.setEnabled(True)
 
+        if self.port.startswith('localhost'):
+            self.port = 'localhost:' + self.server_port + ':'
+
         self.gpsDetector = QgsGpsDetector(self.port)
+            
         self.gpsDetector.detected[QgsGpsConnection].connect(self.connection_succeed) #
         self.gpsDetector.detectionFailed.connect(self.connection_failed)
         self.gpsDetector.advance()
@@ -442,8 +462,10 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
            
             if self.keepFocus:
                 self.setFocus()
-                
+
+           
             self.createGPSObject(gpsInfo)
+
         except Exception as e:
             QgsMessageLog.logMessage('Exception:' + str(e), 'GNAVS')
             self.geConnectionInfoLabel.setText(str(e))
@@ -469,8 +491,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         if self.recordingStyle == 'navigation':
             self.lfbGPSCountTotal.hide()
             self.lfbGPSCountSeperator.hide()
-            #self.lfbGPSCount.hide()
-            #self.label_2.hide()
+            self.lfbGPSCount.hide()
+            self.label_2.hide()
             self.lfbRecordingPercent.hide()
         else:
             self.lfbGPSCountTotal.show()
@@ -503,6 +525,14 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         elif math.isnan(GPSInfo.latitude) or math.isnan(GPSInfo.longitude) or math.isnan(GPSInfo.elevation) or math.isnan(GPSInfo.vdop) or math.isnan(GPSInfo.pdop) or math.isnan(GPSInfo.hdop) or math.isnan(GPSInfo.satellitesUsed) or math.isnan(GPSInfo.quality) or math.isnan(GPSInfo.qualityIndicator):
             isInvalid = True
 
+        
+        self.currentPositionChanged.emit(GPSInfo)
+
+        if self.savedRecordingStyle == 'navigation':
+            return
+        
+        # Point recording 
+
         self.measures.insert(0, {
             'utcDateTime': GPSInfo.utcDateTime.currentMSecsSinceEpoch(),
             'latitude': GPSInfo.latitude,
@@ -516,15 +546,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             'qualityIndicator': random.randint(0,10), #TODO: self.getQualityColor(GPSInfo),
             'invalid': isInvalid
         })
-
-
         self.setMeasurementsCount()
-
-        
-        self.currentPositionChanged.emit(GPSInfo)
-
-        if self.savedRecordingStyle == 'navigation':
-            return
 
         self.aggregatedValuesChanged.emit(self.measures)
 
