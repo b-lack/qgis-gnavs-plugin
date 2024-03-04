@@ -445,7 +445,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         """Update the GPS position and emit values"""
 
         if self.filter_double_coordinates(gpsInfo):
-                return        
+            QgsMessageLog.logMessage('not changing coordinates', 'GNAVS')
+            return        
 
         try:
 
