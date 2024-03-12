@@ -443,15 +443,19 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
     def status_changed(self, gpsInfo):
         """Update the GPS position and emit values"""
+        
 
-        if self.filter_double_coordinates(gpsInfo):
-            QgsMessageLog.logMessage('not changing coordinates', 'GNAVS')
-            return        
+        if self.filter_double_coordinates(gpsInfo, self.lastGPSInfo):
+            return
+        else:
+            QgsMessageLog.logMessage(str(gpsInfo.longitude), 'GNAVS')
+            if self.lastGPSInfo is not None:
+                QgsMessageLog.logMessage(str(self.lastGPSInfo.longitude), 'GNAVS')
+            self.lastGPSInfo = gpsInfo
 
         try:
-
-            
             if gpsInfo.quality == 0:
+                QgsMessageLog.logMessage(str('Invalid: gpsInfo.quality == 0'), 'GNAVS')
                 self.lfbValidIndicator.setStyleSheet("background-color: red; border-radius: 5px;")
                 return
             elif gpsInfo.quality == -1:
@@ -459,7 +463,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             else:
                 self.lfbValidIndicator.setStyleSheet("background-color: green; border-radius: 5px;")
             
-            self.lastGPSInfo = gpsInfo
+            
            
             if self.keepFocus:
                 self.setFocus()
@@ -503,13 +507,13 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.lfbRecordingPercent.show()
 
 
-    def filter_double_coordinates(self, gpsInfo):
+    def filter_double_coordinates(self, gpsInfo, lastGPSInfo):
         """Filter double coordinates"""
 
-        if self.lastGPSInfo is None:
+        if lastGPSInfo is None:
             return False
 
-        if gpsInfo.longitude == self.lastGPSInfo.longitude and gpsInfo.latitude == self.lastGPSInfo.latitude:
+        if gpsInfo.longitude == lastGPSInfo.longitude and gpsInfo.latitude == lastGPSInfo.latitude:
             return True
 
         return False
@@ -519,15 +523,16 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         isInvalid = False
         
-        if GPSInfo.latitude == 0 and GPSInfo.longitude == 0:
+        if GPSInfo.latitude == 0 or GPSInfo.longitude == 0:
             isInvalid = True
         elif GPSInfo.latitude is None or GPSInfo.longitude is None or GPSInfo.elevation is None or GPSInfo.vdop is None or GPSInfo.pdop is None or GPSInfo.hdop is None or GPSInfo.satellitesUsed is None or GPSInfo.quality is None or GPSInfo.qualityIndicator is None:
             isInvalid = True
         elif math.isnan(GPSInfo.latitude) or math.isnan(GPSInfo.longitude) or math.isnan(GPSInfo.elevation) or math.isnan(GPSInfo.vdop) or math.isnan(GPSInfo.pdop) or math.isnan(GPSInfo.hdop) or math.isnan(GPSInfo.satellitesUsed) or math.isnan(GPSInfo.quality) or math.isnan(GPSInfo.qualityIndicator):
             isInvalid = True
 
+        if not isInvalid:
+            self.currentPositionChanged.emit(GPSInfo)
         
-        self.currentPositionChanged.emit(GPSInfo)
 
         if self.savedRecordingStyle == 'navigation':
             return
