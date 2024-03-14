@@ -46,6 +46,8 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
         self.gpsCon = None
         self.lastGPSInfo = None
+        self.lastLat = None
+        self.lastLon = None
         self.keepFocus = False
 
         self._translate = QtCore.QCoreApplication.translate
@@ -288,7 +290,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.geConnectionInfoLabel.setText('Connection exists.')
             return
 
-        if self.port is None:
+        if hasattr(self, "port")== False or self.port is None:
             self.geConnectionInfoLabel.setText(self._translate("Form", 'Wähle ein Gerät aus.'))
             return
         
@@ -443,15 +445,26 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
 
     def status_changed(self, gpsInfo):
         """Update the GPS position and emit values"""
+
+        
+        isDouble = False
+
+        if gpsInfo is None:
+            return
+        
+        
         
 
-        if self.filter_double_coordinates(gpsInfo, self.lastGPSInfo):
+        if self.filter_double_coordinates(gpsInfo, self.lastGPSInfo, self.lastLat, self.lastLon):
+            isDouble = True
+
+        self.lastGPSInfo = gpsInfo
+        self.lastLat = gpsInfo.latitude
+        self.lastLon = gpsInfo.longitude
+
+        if isDouble:
+            #QgsMessageLog.logMessage(str(isDouble), 'GNAVS')
             return
-        else:
-            QgsMessageLog.logMessage(str(gpsInfo.longitude), 'GNAVS')
-            if self.lastGPSInfo is not None:
-                QgsMessageLog.logMessage(str(self.lastGPSInfo.longitude), 'GNAVS')
-            self.lastGPSInfo = gpsInfo
 
         try:
             if gpsInfo.quality == 0:
@@ -507,13 +520,13 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
             self.lfbRecordingPercent.show()
 
 
-    def filter_double_coordinates(self, gpsInfo, lastGPSInfo):
+    def filter_double_coordinates(self, gpsInfo, lastGPSInfo, lastLat, lastLon):
         """Filter double coordinates"""
 
         if lastGPSInfo is None:
             return False
 
-        if gpsInfo.longitude == lastGPSInfo.longitude and gpsInfo.latitude == lastGPSInfo.latitude:
+        if gpsInfo.longitude == lastLon and gpsInfo.latitude == lastLat:
             return True
 
         return False
