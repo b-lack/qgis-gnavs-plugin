@@ -19,7 +19,7 @@ class Target(QtWidgets.QWidget, UI_CLASS):
     Sets up the target view, shows the selected target and updates distances and bearings.
     """
 
-    def __init__(self, interface, targetElement=None, onlyOne=False):
+    def __init__(self, interface, targetElement=None, onlyOne=False, degUnit=None):
         """Constructor."""
 
         QDialog.__init__(self, interface.mainWindow())
@@ -27,6 +27,7 @@ class Target(QtWidgets.QWidget, UI_CLASS):
 
         self.interface = interface
         self.targetElement = targetElement
+        self.degUnit = degUnit
 
         self.lfbTargetRemoveBtn.clicked.connect(self.removeTargetSelection)
         self.lfbTargetFokusBtn.clicked.connect(self.fokusToTarget)
@@ -106,8 +107,11 @@ class Target(QtWidgets.QWidget, UI_CLASS):
             self.lfbDistanceEdit.setText("-")
             self.lfbDistanceUnit.setText("km")
 
-
-        degUnit = Utils.getSetting('degUnit', 'deg')
+        if self.degUnit is not None:
+            degUnit = self.degUnit
+        else:
+            degUnit = Utils.getSetting('degUnit', 'deg')
+            
         if degUnit == 'deg':
             self.lfbBearingUnit.setText("°")
         elif  degUnit == 'gon':

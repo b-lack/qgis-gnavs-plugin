@@ -465,7 +465,7 @@ class Recording(QtWidgets.QWidget, UI_CLASS):
         if isDouble:
             #QgsMessageLog.logMessage(str(isDouble), 'GNAVS')
             return
-
+         
         try:
             if gpsInfo.quality == 0:
                 QgsMessageLog.logMessage(str('Invalid: gpsInfo.quality == 0'), 'GNAVS')

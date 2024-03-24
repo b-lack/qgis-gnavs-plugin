@@ -21,7 +21,7 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
     Sets up the selection view, shows selected features and updates distances and bearings.
     """
 
-    def __init__(self, interface, onlyOne=False):
+    def __init__(self, interface, onlyOne=False, degUnit=None):
         """Constructor."""
 
         QDialog.__init__(self, interface.mainWindow())
@@ -32,7 +32,7 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
         self.targets = None
         self.interface = interface
         self.onlyOne = onlyOne
-
+        self.degUnit = degUnit
 
         self.updateToC()
 
@@ -149,7 +149,7 @@ class Selection(QtWidgets.QWidget, UI_CLASS):
 
             for targetElement in newTargets:
 
-                target = Target(self.interface, targetElement, self.onlyOne)
+                target = Target(self.interface, targetElement, self.onlyOne, self.degUnit)
                 self.lfbSelectedTargets.addWidget(target)
                 Utils.drawDistance('lfb-tmp-distance',targetElement['startPoint'], targetElement['endPoint'])
         #else:
